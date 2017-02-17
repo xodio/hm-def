@@ -104,4 +104,12 @@ describe('Signature', () => {
     const types = sigTypes($.env, 'foo :: { value :: Number } -> Number');
     assertDeepEqual(types, [$.RecordType({ value: $.Number }), $.Number]);
   });
+
+  it('should resolve constraints', () => {
+    const a = $.TypeVariable('a');
+    const b = $.TypeVariable('b');
+    const f = $.UnaryTypeVariable('f');
+    const types = sigTypes($.env, 'foo :: Functor f => (a -> b) -> f a -> f b');
+    assertDeepEqual(types, [$.Function([a, b]), f(a), f(b)]);
+  });
 });

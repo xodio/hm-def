@@ -48,6 +48,9 @@ const lookupType = typeMap => (entry) => {
   return t;
 };
 
+// Helper Type to wipe out thunks
+const Thunk = $.NullaryType('hm-def/Thunk', '', R.F);
+
 // :: TypeMap -> SignatureEntry -> Type
 const convertTypeConstructor = typeMap => entry => R.ifElse(
   hasChildren,
@@ -93,6 +96,13 @@ const convertRecord = typeMap => entry => $.RecordType(
 // :: SignatureEntry -> Type
 const convertTypevar = R.memoize(R.compose($.TypeVariable, R.prop('text')));
 
+// :: SignatureEntry -> (Type -> Type)
+const unaryTypevar = R.memoize(R.compose($.UnaryTypeVariable, R.prop('text')));
+
+// :: TypeMap -> SignatureEntry -> Type
+const convertConstrainedType = typeMap => entry =>
+  unaryTypevar(entry)(convertType(typeMap)(entry.children[0]));
+
 // :: TypeMap -> SignatureEntry -> Type|Null
 function convertType(typeMap) {
   return R.cond([
@@ -100,14 +110,19 @@ function convertType(typeMap) {
     [typeEq('function'), convertFunction(typeMap)],
     [typeEq('list'), convertList(typeMap)],
     [typeEq('record'), convertRecord(typeMap)],
+    [typeEq('constrainedType'), convertConstrainedType(typeMap)],
     [typeEq('typevar'), convertTypevar],
+    [typeEq('thunk'), R.always(Thunk)],
+    [R.T, (entry) => {
+      throw new Error(`Don't know what to do with signature entry ${entry.type}`);
+    }],
   ]);
 }
 
 // :: TypeMap -> [SignatureEntry] -> [Type]
 function convertTypes(typeMap) {
   return R.compose(
-    R.reject(R.isNil),
+    R.reject(R.equals(Thunk)),
     R.map(convertType(typeMap)),
   );
 }
