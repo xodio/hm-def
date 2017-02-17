@@ -54,9 +54,9 @@ const convertTypeConstructor = typeMap => entry => R.ifElse(
   R.compose(
     R.apply(lookupType(typeMap)(entry)),
     convertTypes(typeMap),
-    R.prop('children')
+    R.prop('children'),
   ),
-  lookupType(typeMap)
+  lookupType(typeMap),
 )(entry);
 
 // :: TypeMap -> SignatureEntry -> Type
@@ -64,7 +64,7 @@ const convertList = R.useWith(
   R.compose($.Array, uncurry2(convertType)), [
     R.identity,
     R.path(['children', 0]),
-  ]
+  ],
 );
 
 // :: TypeMap -> SignatureEntry -> Type
@@ -72,7 +72,7 @@ const convertFunction = R.useWith(
   R.compose($.Function, uncurry2(convertTypes)), [
     R.identity,
     R.prop('children'),
-  ]
+  ],
 );
 
 // :: TypeMap -> SignatureEntry -> Pair(String, Type)
@@ -86,8 +86,8 @@ const convertRecord = typeMap => entry => $.RecordType(
   R.compose(
     R.fromPairs,
     R.map(convertRecordField(typeMap)),
-    R.prop('children')
-  )(entry)
+    R.prop('children'),
+  )(entry),
 );
 
 // :: SignatureEntry -> Type
@@ -108,7 +108,7 @@ function convertType(typeMap) {
 function convertTypes(typeMap) {
   return R.compose(
     R.reject(R.isNil),
-    R.map(convertType(typeMap))
+    R.map(convertType(typeMap)),
   );
 }
 
@@ -121,14 +121,14 @@ const stripNamespace = R.compose(R.last, R.split('/'));
 // Type -> Type
 const ensureParametrized = R.when(
   R.is(Function),
-  fn => R.apply(fn, R.repeat($.Unknown, fn.length))
+  fn => R.apply(fn, R.repeat($.Unknown, fn.length)),
 );
 
 // :: Type -> String
 const shortName = R.compose(
   stripNamespace,
   R.prop('name'),
-  ensureParametrized
+  ensureParametrized,
 );
 
 // :: [Type] -> TypeMap

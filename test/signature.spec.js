@@ -29,7 +29,7 @@ function logHMP(sig) { console.log(JSON.stringify(HMP.parse(sig), null, 2)); }
 describe('Signature', () => {
   const sigTypes = (env, sig) => Sig.types(
     Sig.typemap(env),
-    HMP.parse(sig).type.children
+    HMP.parse(sig).type.children,
   );
 
   it('should resolve built-in types', () => {
@@ -73,7 +73,7 @@ describe('Signature', () => {
       'my-package/Maybe',
       'http://example.com/my-package#Maybe',
       R.T,
-      R.always([])
+      R.always([]),
     );
 
     const env = R.append(Maybe, $.env);
@@ -87,7 +87,7 @@ describe('Signature', () => {
       'http://example.com/my-package#Either',
       R.T,
       R.always([]),
-      R.always([])
+      R.always([]),
     );
 
     const env = R.append(Either, $.env);

@@ -9,7 +9,7 @@ describe('def', () => {
   it('should work with unary functions', () => {
     const foo = def(
       'foo :: Number -> String',
-      x => x.toString()
+      x => x.toString(),
     );
 
     assert.strictEqual(foo(42), '42');
@@ -19,7 +19,7 @@ describe('def', () => {
   it('should work with thunks', () => {
     const foo = def(
       'foo :: () -> Number',
-      () => 42
+      () => 42,
     );
 
     assert.strictEqual(foo(), 42);
@@ -28,7 +28,7 @@ describe('def', () => {
   it('should work with records', () => {
     const foo = def(
       'foo :: Number -> { value :: Number }',
-      x => ({ value: x })
+      x => ({ value: x }),
     );
 
     assert.deepEqual(foo(42), { value: 42 });
