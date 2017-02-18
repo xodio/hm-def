@@ -29,8 +29,6 @@ HMP.parse('hello :: Foo a => a -> String');
 // eslint-disable-next-line no-unused-vars
 export const constraints = sig => ({});
 
-const uncurry2 = R.uncurryN(2);
-const recurry2 = R.compose(R.curry, uncurry2);
 const lift = R.map;
 
 // :: Object -> String -> Boolean
@@ -40,7 +38,7 @@ const typeEq = R.propEq('type');
 const hasChildren = R.compose(R.not, R.isEmpty, R.prop('children'));
 
 // :: SignatureEntry -> Reader TypeMap Type
-const lookupType = entry => Reader(typeMap => {
+const lookupType = entry => Reader((typeMap) => {
   const name = entry.text;
   const t = typeMap[name];
   if (!t) {
@@ -57,8 +55,8 @@ const Thunk = $.NullaryType('hm-def/Thunk', '', R.F);
 const convertTypeConstructor = entry => R.ifElse(
   hasChildren,
   R.compose(
-    readerOfArgs => Reader(typeMap => 
-      lookupType(entry).run(typeMap)(...readerOfArgs.run(typeMap))
+    readerOfArgs => Reader(typeMap =>
+      lookupType(entry).run(typeMap)(...readerOfArgs.run(typeMap)),
     ),
     convertTypes,
     R.prop('children'),
@@ -104,7 +102,7 @@ const unaryTypevar = R.memoize(R.compose($.UnaryTypeVariable, R.prop('text')));
 
 // :: SignatureEntry -> Reader TypeMap Type
 const convertConstrainedType = entry => Reader(typeMap =>
-  unaryTypevar(entry)(convertType(entry.children[0]).run(typeMap)) // TODO:
+  unaryTypevar(entry)(convertType(entry.children[0]).run(typeMap)), // TODO:
 );
 
 // :: SignatureEntry -> Reader TypeMap Type
@@ -117,8 +115,8 @@ function convertType(entry) {
     [typeEq('constrainedType'), convertConstrainedType],
     [typeEq('typevar'), R.compose(Reader.of, convertTypevar)],
     [typeEq('thunk'), R.always(Reader.of(Thunk))],
-    [R.T, (entry) => {
-      throw new Error(`Don't know what to do with signature entry ${entry.type}`);
+    [R.T, (e) => {
+      throw new Error(`Don't know what to do with signature entry ${e.type}`);
     }],
   ])(entry);
 }
@@ -133,9 +131,9 @@ function convertTypes(entries) {
 }
 
 // :: TypeMap -> [SignatureEntry] -> [Type]
-export const types = R.curry((typeMap, entries) => {
-  return convertTypes(entries).run(typeMap);
-});
+export const types = R.curry((typeMap, entries) =>
+  convertTypes(entries).run(typeMap),
+);
 
 // :: String -> String
 const stripNamespace = R.compose(R.last, R.split('/'));
