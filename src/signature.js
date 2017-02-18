@@ -78,11 +78,11 @@ const convertFunction = R.compose(
 );
 
 // :: SignatureEntry -> Reader TypeMap (Pair String Type)
-const convertRecordField = entry =>
-  convertType(entry.children[0]).map(valueType => [
-    entry.text, // field key
-    valueType,  // field value
-  ]);
+const convertRecordField = entry => R.compose(
+  lift(valueType => [entry.text, valueType]),
+  convertType,
+  R.path(['children', 0]),
+)(entry);
 
 // :: SignatureEntry -> Reader TypeMap Type
 const convertRecord = R.compose(
