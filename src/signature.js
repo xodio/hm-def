@@ -100,9 +100,11 @@ const convertTypevar = R.memoize(R.compose($.TypeVariable, R.prop('text')));
 const unaryTypevar = R.memoize(R.compose($.UnaryTypeVariable, R.prop('text')));
 
 // :: SignatureEntry -> Reader TypeMap Type
-const convertConstrainedType = entry => Reader(typeMap =>
-  unaryTypevar(entry)(convertType(entry.children[0]).run(typeMap)), // TODO:
-);
+const convertConstrainedType = entry => R.compose(
+  lift(unaryTypevar(entry)),
+  convertType,
+  R.path(['children', 0]),
+)(entry);
 
 // :: SignatureEntry -> Reader TypeMap Type
 function convertType(entry) {
