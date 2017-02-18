@@ -30,6 +30,7 @@ HMP.parse('hello :: Foo a => a -> String');
 export const constraints = sig => ({});
 
 const lift = R.map;
+const lift2 = R.liftN(2);
 
 // :: Object -> String -> Boolean
 const typeEq = R.propEq('type');
@@ -55,9 +56,7 @@ const Thunk = $.NullaryType('hm-def/Thunk', '', R.F);
 const convertTypeConstructor = entry => R.ifElse(
   hasChildren,
   R.compose(
-    readerOfArgs => Reader(typeMap =>
-      lookupType(entry).run(typeMap)(...readerOfArgs.run(typeMap)),
-    ),
+    lift2(R.apply)(lookupType(entry)),
     convertTypes,
     R.prop('children'),
   ),
