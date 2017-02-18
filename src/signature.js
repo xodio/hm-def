@@ -32,6 +32,12 @@ export const constraints = sig => ({});
 const lift = R.map;
 const lift2 = R.liftN(2);
 
+// :: { children :: [a] } -> [a]
+const children = R.prop('children');
+
+// :: { children :: [a] } -> a
+const firstChild = R.compose(R.prop(0), children);
+
 // :: Object -> String -> Boolean
 const typeEq = R.propEq('type');
 
@@ -58,7 +64,7 @@ const convertTypeConstructor = entry => R.ifElse(
   R.compose(
     lift2(R.apply)(lookupType(entry)),
     convertTypes,
-    R.prop('children'),
+    children,
   ),
   lookupType,
 )(entry);
@@ -67,21 +73,21 @@ const convertTypeConstructor = entry => R.ifElse(
 const convertList = R.compose(
   lift($.Array),
   convertType,
-  R.path(['children', 0]),
+  firstChild,
 );
 
 // :: SignatureEntry -> Reader TypeMap Type
 const convertFunction = R.compose(
   lift($.Function),
   convertTypes,
-  R.prop('children'),
+  children,
 );
 
 // :: SignatureEntry -> Reader TypeMap (Pair String Type)
 const convertRecordField = entry => R.compose(
   lift(valueType => [entry.text, valueType]),
   convertType,
-  R.path(['children', 0]),
+  firstChild,
 )(entry);
 
 // :: SignatureEntry -> Reader TypeMap Type
@@ -90,7 +96,7 @@ const convertRecord = R.compose(
   lift(R.fromPairs),
   R.sequence(Reader.of),
   R.map(convertRecordField),
-  R.prop('children'),
+  children,
 );
 
 // :: SignatureEntry -> Type
@@ -103,7 +109,7 @@ const unaryTypevar = R.memoize(R.compose($.UnaryTypeVariable, R.prop('text')));
 const convertConstrainedType = entry => R.compose(
   lift(unaryTypevar(entry)),
   convertType,
-  R.path(['children', 0]),
+  firstChild,
 )(entry);
 
 // :: SignatureEntry -> Reader TypeMap Type
