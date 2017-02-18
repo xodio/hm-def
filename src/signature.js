@@ -1,5 +1,6 @@
 
 import R from 'ramda';
+import { Reader } from 'ramda-fantasy';
 import $ from 'sanctuary-def';
 
 /* We need a recursion, so: */
@@ -30,6 +31,7 @@ export const constraints = sig => ({});
 
 const uncurry2 = R.uncurryN(2);
 const recurry2 = R.compose(R.curry, uncurry2);
+const lift = R.map;
 
 // :: Object -> String -> Boolean
 const typeEq = R.propEq('type');
@@ -37,8 +39,8 @@ const typeEq = R.propEq('type');
 // :: SignatureEntry -> Boolean
 const hasChildren = R.compose(R.not, R.isEmpty, R.prop('children'));
 
-// :: TypeMap -> SignatureEntry -> Type
-const lookupType = typeMap => (entry) => {
+// :: SignatureEntry -> Reader TypeMap Type
+const lookupType = entry => Reader(typeMap => {
   const name = entry.text;
   const t = typeMap[name];
   if (!t) {
@@ -46,51 +48,52 @@ const lookupType = typeMap => (entry) => {
     throw new TypeError(`Type ${name} not found in env. Available types are: ${allTypes}`);
   }
   return t;
-};
+});
 
 // Helper Type to wipe out thunks
 const Thunk = $.NullaryType('hm-def/Thunk', '', R.F);
 
-// :: TypeMap -> SignatureEntry -> Type
-const convertTypeConstructor = typeMap => entry => R.ifElse(
+// :: SignatureEntry -> Reader TypeMap Type
+const convertTypeConstructor = entry => R.ifElse(
   hasChildren,
   R.compose(
-    R.apply(lookupType(typeMap)(entry)),
-    convertTypes(typeMap),
+    readerOfArgs => Reader(typeMap => 
+      lookupType(entry).run(typeMap)(...readerOfArgs.run(typeMap))
+    ),
+    convertTypes,
     R.prop('children'),
   ),
-  lookupType(typeMap),
+  lookupType,
 )(entry);
 
-// :: TypeMap -> SignatureEntry -> Type
-const convertList = R.useWith(
-  R.compose($.Array, uncurry2(convertType)), [
-    R.identity,
-    R.path(['children', 0]),
-  ],
+// :: SignatureEntry -> Reader TypeMap Type
+const convertList = R.compose(
+  lift($.Array),
+  convertType,
+  R.path(['children', 0]),
 );
 
-// :: TypeMap -> SignatureEntry -> Type
-const convertFunction = R.useWith(
-  R.compose($.Function, uncurry2(convertTypes)), [
-    R.identity,
-    R.prop('children'),
-  ],
+// :: SignatureEntry -> Reader TypeMap Type
+const convertFunction = R.compose(
+  lift($.Function),
+  convertTypes,
+  R.prop('children'),
 );
 
-// :: TypeMap -> SignatureEntry -> Pair(String, Type)
-const convertRecordField = typeMap => field => [
-  field.text,
-  convertType(typeMap)(field.children[0]),
-];
+// :: SignatureEntry -> Reader TypeMap (Pair String Type)
+const convertRecordField = entry =>
+  convertType(entry.children[0]).map(valueType => [
+    entry.text, // field key
+    valueType,  // field value
+  ]);
 
-// :: TypeMap -> SignatureEntry -> Type
-const convertRecord = typeMap => entry => $.RecordType(
-  R.compose(
-    R.fromPairs,
-    R.map(convertRecordField(typeMap)),
-    R.prop('children'),
-  )(entry),
+// :: SignatureEntry -> Reader TypeMap Type
+const convertRecord = R.compose(
+  lift($.RecordType),
+  lift(R.fromPairs),
+  R.sequence(Reader.of),
+  R.map(convertRecordField),
+  R.prop('children'),
 );
 
 // :: SignatureEntry -> Type
@@ -99,36 +102,40 @@ const convertTypevar = R.memoize(R.compose($.TypeVariable, R.prop('text')));
 // :: SignatureEntry -> (Type -> Type)
 const unaryTypevar = R.memoize(R.compose($.UnaryTypeVariable, R.prop('text')));
 
-// :: TypeMap -> SignatureEntry -> Type
-const convertConstrainedType = typeMap => entry =>
-  unaryTypevar(entry)(convertType(typeMap)(entry.children[0]));
+// :: SignatureEntry -> Reader TypeMap Type
+const convertConstrainedType = entry => Reader(typeMap =>
+  unaryTypevar(entry)(convertType(entry.children[0]).run(typeMap)) // TODO:
+);
 
-// :: TypeMap -> SignatureEntry -> Type|Null
-function convertType(typeMap) {
+// :: SignatureEntry -> Reader TypeMap Type
+function convertType(entry) {
   return R.cond([
-    [typeEq('typeConstructor'), convertTypeConstructor(typeMap)],
-    [typeEq('function'), convertFunction(typeMap)],
-    [typeEq('list'), convertList(typeMap)],
-    [typeEq('record'), convertRecord(typeMap)],
-    [typeEq('constrainedType'), convertConstrainedType(typeMap)],
-    [typeEq('typevar'), convertTypevar],
-    [typeEq('thunk'), R.always(Thunk)],
+    [typeEq('typeConstructor'), convertTypeConstructor],
+    [typeEq('function'), convertFunction],
+    [typeEq('list'), convertList],
+    [typeEq('record'), convertRecord],
+    [typeEq('constrainedType'), convertConstrainedType],
+    [typeEq('typevar'), R.compose(Reader.of, convertTypevar)],
+    [typeEq('thunk'), R.always(Reader.of(Thunk))],
     [R.T, (entry) => {
       throw new Error(`Don't know what to do with signature entry ${entry.type}`);
     }],
-  ]);
+  ])(entry);
+}
+
+// :: [SignatureEntry] -> Reader TypeMap [Type]
+function convertTypes(entries) {
+  return R.compose(
+    lift(R.reject(R.equals(Thunk))),
+    R.sequence(Reader.of),
+    R.map(convertType),
+  )(entries);
 }
 
 // :: TypeMap -> [SignatureEntry] -> [Type]
-function convertTypes(typeMap) {
-  return R.compose(
-    R.reject(R.equals(Thunk)),
-    R.map(convertType(typeMap)),
-  );
-}
-
-// :: TypeMap -> ParsedSignature -> [Type]
-export const types = recurry2(convertTypes);
+export const types = R.curry((typeMap, entries) => {
+  return convertTypes(entries).run(typeMap);
+});
 
 // :: String -> String
 const stripNamespace = R.compose(R.last, R.split('/'));
