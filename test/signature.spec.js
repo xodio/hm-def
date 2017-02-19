@@ -3,7 +3,7 @@ import R from 'ramda';
 import $ from 'sanctuary-def';
 import HMP from 'hm-parser';
 import { assert } from 'chai';
-import * as Sig from '../src/signature';
+import { resolve } from '../src/signature';
 
 // :: Any -> Any
 function wipeFunctions(x) {
@@ -26,45 +26,47 @@ function logHMP(sig) { console.log(JSON.stringify(HMP.parse(sig), null, 2)); }
 /* Types are by convention starts with a capital leter, so: */
 /* eslint-disable new-cap */
 
-describe('Signature', () => {
-  const sigTypes = (env, sig) => Sig.types(
-    Sig.typemap(env),
-    HMP.parse(sig).type.children,
-  );
+describe('Function name', () => {
+  it('should be extracted', () => {
+    const { name } = resolve($.env, 'foo :: Number -> Number');
+    assert.strictEqual(name, 'foo');
+  });
+});
 
+describe('Parameter types', () => {
   it('should resolve built-in types', () => {
-    const types = sigTypes($.env, 'foo :: Number -> String');
+    const { types } = resolve($.env, 'foo :: Number -> String');
     assertDeepEqual(types, [$.Number, $.String]);
   });
 
   it('should resolve user types', () => {
     const Widget = $.NullaryType('Widget', 'http://example.com/Widget', R.T);
     const env = R.append(Widget, $.env);
-    const types = sigTypes(env, 'foo :: Widget -> String');
+    const { types } = resolve(env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
 
   it('should resolve namespaced user types', () => {
     const Widget = $.NullaryType('x/y/z/Widget', 'http://example.com/Widget', R.T);
     const env = R.append(Widget, $.env);
-    const types = sigTypes(env, 'foo :: Widget -> String');
+    const { types } = resolve(env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
 
   it('should resolve lists', () => {
-    const types = sigTypes($.env, 'foo :: [Number] -> [String]');
+    const { types } = resolve($.env, 'foo :: [Number] -> [String]');
     assertDeepEqual(types, [$.Array($.Number), $.Array($.String)]);
   });
 
   it('should resolve functions', () => {
-    const types = sigTypes($.env, 'foo :: Number -> (Number -> Number)');
+    const { types } = resolve($.env, 'foo :: Number -> (Number -> Number)');
     assertDeepEqual(types, [$.Number, $.Function([$.Number, $.Number])]);
   });
 
   it('should resolve typevars', () => {
     const a = $.TypeVariable('a');
     const b = $.TypeVariable('b');
-    const types = sigTypes($.env, 'foo :: a -> b -> a');
+    const { types } = resolve($.env, 'foo :: a -> b -> a');
     assertDeepEqual(types, [a, b, a]);
   });
 
@@ -77,7 +79,7 @@ describe('Signature', () => {
     );
 
     const env = R.append(Maybe, $.env);
-    const types = sigTypes(env, 'foo :: Maybe String -> String');
+    const { types } = resolve(env, 'foo :: Maybe String -> String');
     assertDeepEqual(types, [Maybe($.String), $.String]);
   });
 
@@ -91,17 +93,17 @@ describe('Signature', () => {
     );
 
     const env = R.append(Either, $.env);
-    const types = sigTypes(env, 'foo :: Either String Number -> String');
+    const { types } = resolve(env, 'foo :: Either String Number -> String');
     assertDeepEqual(types, [Either($.String, $.Number), $.String]);
   });
 
   it('should resolve thunks', () => {
-    const types = sigTypes($.env, 'foo :: () -> Number');
+    const { types } = resolve($.env, 'foo :: () -> Number');
     assertDeepEqual(types, [$.Number]);
   });
 
   it('should resolve records', () => {
-    const types = sigTypes($.env, 'foo :: { value :: Number } -> Number');
+    const { types } = resolve($.env, 'foo :: { value :: Number } -> Number');
     assertDeepEqual(types, [$.RecordType({ value: $.Number }), $.Number]);
   });
 
@@ -109,7 +111,7 @@ describe('Signature', () => {
     const a = $.TypeVariable('a');
     const b = $.TypeVariable('b');
     const f = $.UnaryTypeVariable('f');
-    const types = sigTypes($.env, 'foo :: Functor f => (a -> b) -> f a -> f b');
+    const { types } = resolve($.env, 'foo :: Functor f => (a -> b) -> f a -> f b');
     assertDeepEqual(types, [$.Function([a, b]), f(a), f(b)]);
   });
 });

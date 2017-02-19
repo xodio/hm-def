@@ -1,15 +1,13 @@
 
 import $ from 'sanctuary-def';
-import HMP from 'hm-parser';
 import * as Sig from './signature';
 
 function create({ checkTypes, env }) {
   const $def = $.create({ checkTypes, env });
 
   return function def(signature, func) {
-    const sig = HMP.parse(signature);
-    const sigTypes = Sig.types(Sig.typemap(env), sig.type.children);
-    return $def(sig.name, Sig.constraints(sig), sigTypes, func);
+    const params = Sig.resolve(env, signature);
+    return $def(params.name, params.constraints, params.types, func);
   };
 }
 

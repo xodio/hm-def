@@ -1,6 +1,7 @@
 
 import R from 'ramda';
 import { Reader } from 'ramda-fantasy';
+import HMP from 'hm-parser';
 import $ from 'sanctuary-def';
 
 /* We need a recursion, so: */
@@ -137,11 +138,6 @@ function convertTypes(entries) {
   )(entries);
 }
 
-// :: TypeMap -> [SignatureEntry] -> [Type]
-export const types = R.curry((typeMap, entries) =>
-  convertTypes(entries).run(typeMap),
-);
-
 // :: String -> String
 const stripNamespace = R.compose(R.last, R.split('/'));
 
@@ -159,4 +155,20 @@ const shortName = R.compose(
 );
 
 // :: [Type] -> TypeMap
-export const typemap = R.indexBy(shortName);
+const indexTypes = R.indexBy(shortName);
+
+// :: String -> {
+//      name :: String,
+//      constraints :: StrMap TypeClass,
+//      types :: [Type]
+//    }
+export const resolve = R.curry((env, signature) => {
+  const typeMap = indexTypes(env);
+  const sig = HMP.parse(signature);
+  const entries = sig.type.children;
+  return {
+    name: sig.name,
+    constraints: constraints(sig),
+    types: convertTypes(entries).run(typeMap),
+  };
+});
