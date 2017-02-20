@@ -26,12 +26,65 @@ HMP.parse('hello :: Foo a => a -> String');
 
 // type TypeMap = StrMap Type
 
-// TODO: implement, so
-// eslint-disable-next-line no-unused-vars
-export const constraints = sig => ({});
+//-----------------------------------------------------------------------------
+//
+// Utilities
+//
+//-----------------------------------------------------------------------------
 
 const lift = R.map;
 const lift2 = R.liftN(2);
+const uncurry2 = R.uncurryN(2);
+
+// :: String -> String
+const stripNamespace = R.compose(R.last, R.split('/'));
+
+//-----------------------------------------------------------------------------
+//
+// Type classes
+//
+//-----------------------------------------------------------------------------
+
+// TypeClassMap -> String -> TypeClass
+const lookupTypeClass = tcm => (name) => {
+  const tc = tcm[name];
+  if (!tc) {
+    const allTypeClasses = R.keys(tcm).join(', ');
+    throw new TypeError(
+      `Type class ${name} not found. ` +
+      `Available type classes are: ${allTypeClasses}`,
+    );
+  }
+
+  return tc;
+};
+
+// [SignatureConstraint] -> StrMap String
+export const constraintNames = R.converge(R.zipObj, [
+  R.pluck('typevar'),
+  R.pluck('typeclass'),
+]);
+
+// TypeClassMap -> [SignatureConstraint] -> StrMap [TypeClass]
+export const constraints = uncurry2(
+  tcm => R.compose(
+    R.map(R.of),
+    R.map(lookupTypeClass(tcm)),
+    constraintNames,
+  ),
+);
+
+// :: [TypeClass] -> TypeClassMap
+const indexTypeClasses = R.indexBy(R.compose(
+  stripNamespace,
+  R.prop('name'),
+));
+
+//-----------------------------------------------------------------------------
+//
+// Types
+//
+//-----------------------------------------------------------------------------
 
 // :: { children :: [a] } -> [a]
 const children = R.prop('children');
@@ -51,7 +104,10 @@ const lookupType = entry => Reader((typeMap) => {
   const t = typeMap[name];
   if (!t) {
     const allTypes = R.keys(typeMap).join(', ');
-    throw new TypeError(`Type ${name} not found in env. Available types are: ${allTypes}`);
+    throw new TypeError(
+      `Type ${name} not found in env. ` +
+      `Available types are: ${allTypes}`,
+    );
   }
   return t;
 });
@@ -138,9 +194,6 @@ function convertTypes(entries) {
   )(entries);
 }
 
-// :: String -> String
-const stripNamespace = R.compose(R.last, R.split('/'));
-
 // Type -> Type
 const ensureParametrized = R.when(
   R.is(Function),
@@ -157,18 +210,25 @@ const shortName = R.compose(
 // :: [Type] -> TypeMap
 const indexTypes = R.indexBy(shortName);
 
-// :: String -> {
+//-----------------------------------------------------------------------------
+//
+// API
+//
+//-----------------------------------------------------------------------------
+
+// :: [TypeClass] -> [Type] -> String -> {
 //      name :: String,
 //      constraints :: StrMap TypeClass,
 //      types :: [Type]
 //    }
-export const resolve = R.curry((env, signature) => {
+export const resolve = R.curry((typeClasses, env, signature) => {
   const typeMap = indexTypes(env);
+  const typeClassMap = indexTypeClasses(typeClasses);
   const sig = HMP.parse(signature);
   const entries = sig.type.children;
   return {
     name: sig.name,
-    constraints: constraints(sig),
+    constraints: constraints(typeClassMap, sig.constraints),
     types: convertTypes(entries).run(typeMap),
   };
 });

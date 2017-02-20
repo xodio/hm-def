@@ -26,6 +26,7 @@
     "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "sanctuary-type-classes": "^3.0.1"
   }
 }

@@ -1,11 +1,16 @@
 
 import $ from 'sanctuary-def';
+import Z from 'sanctuary-type-classes';
 import { assert } from 'chai';
 import HMD from '../src/index';
 
 const def = HMD.create({
   checkTypes: true,
   env: $.env,
+  typeClasses: [
+    Z.Functor,
+    Z.Semigroup,
+  ],
 });
 
 describe('def', () => {
@@ -39,13 +44,24 @@ describe('def', () => {
 
   it('should work with unary type variables', () => {
     const foo = def(
-      'foo :: Functor f => (a -> b) -> f a -> f b',
+      'foo :: (a -> b) -> f a -> f b',
       (fn, x) => x.map(e => fn(e)),
     );
 
     const cube = x => x * x * x;
 
     assert.deepEqual(foo(cube, [1, 2, 3]), [1, 8, 27]);
-    assert.throws(() => foo(cube, 'im-not-a-functor'), 'Type-variable constraint violation');
+    assert.throws(() => foo(cube, 'im-not-an-unary-type'), 'Type-variable constraint violation');
+  });
+
+  it('should work with type class constraints', () => {
+    const foo = def(
+      'foo :: Semigroup a => a -> a -> a',
+      (y, x) => x.concat(y),
+    );
+
+    assert.deepEqual(foo([3, 4], [1, 2]), [1, 2, 3, 4]);
+    assert.deepEqual(foo(' world', 'Hello'), 'Hello world');
+    assert.throws(() => foo(42, 13), 'requires ‘a’ to satisfy the Semigroup type-class constraint');
   });
 });
