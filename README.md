@@ -101,6 +101,26 @@ const magnitude = def(
 Where `Array` is a regular unary type provided by the default environment.
 It takes a single type argument which describes the type of array’s elements.
 
+### Records
+
+To denote objects with a known schema record syntax is used:
+
+```javascript
+const minMax = def(
+  'minMax :: [Number] -> { min :: Number, max :: Number }',
+  xs => xs.reduce(
+    (acc, x) => ({
+      min: Math.min(x, acc.min),
+      max: Math.max(x, acc.max),
+    }),
+    { min: Infinity, max: -Infinity }
+  )
+);
+
+minMax([1, 4, 6, 3, 4, 5, -3, 4]);
+// { min: -3, max: 6 }
+```
+
 ### Types available
 
 You pass type definitions with `env` option of `HMD.create`. `$.env` from

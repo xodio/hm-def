@@ -90,6 +90,22 @@ describe('README examples', () => {
     assert.equal(result, 5);
   });
 
+  it('should have correct minMax', () => {
+    const minMax = def(
+      'minMax :: [Number] -> { min :: Number, max :: Number }',
+      xs => xs.reduce(
+        (acc, x) => ({
+          min: Math.min(x, acc.min),
+          max: Math.max(x, acc.max),
+        }),
+        { min: Infinity, max: -Infinity }
+      )
+    );
+
+    const result = minMax([1, 4, 6, 3, 4, 5, -3, 4]);
+    assert.deepEqual(result, { min: -3, max: 6 });
+  });
+
   it('should work with manually curried functions', () => {
     const rejectValues = def.curried(
       'rejectValues :: [a] -> [a] -> [a]',
