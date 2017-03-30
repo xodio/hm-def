@@ -80,6 +80,16 @@ describe('def', () => {
 });
 
 describe('README examples', () => {
+  it('should have correct magnitude', () => {
+    const magnitude = def(
+      'magnitude :: [Number] -> Number',
+      xs => Math.sqrt(xs.reduce((acc, x) => acc + x * x, 0))
+    );
+
+    const result = magnitude([3, 4, 0]);
+    assert.equal(result, 5);
+  });
+
   it('should work with manually curried functions', () => {
     const rejectValues = def.curried(
       'rejectValues :: [a] -> [a] -> [a]',

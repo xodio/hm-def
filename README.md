@@ -68,6 +68,39 @@ sum('42', 13);
 // The value at position 1 is not a member of ‘Number’.
 ```
 
+### Arrays
+
+To denote an array you enclose type of its elements in square brackets:
+
+```javascript
+const magnitude = def(
+  'magnitude :: [Number] -> Number',
+  xs => Math.sqrt(xs.reduce((acc, x) => acc + x * x, 0))
+);
+
+magnitude([3, 4, 0]);
+// 5
+
+magnitude(3, 4, 0);
+// TypeError: Function applied to too many arguments
+//
+// magnitude :: Array Number -> Number
+//
+// ‘magnitude’ expected at most one argument but received three arguments.
+```
+
+Actually it’s just a shortcut to a more general:
+
+```javascript
+const magnitude = def(
+  'magnitude :: Array Number -> Number',
+  xs => Math.sqrt(xs.reduce((acc, x) => acc + x * x, 0))
+);
+```
+
+Where `Array` is a regular unary type provided by the default environment.
+It takes a single type argument which describes the type of array’s elements.
+
 ### Types available
 
 You pass type definitions with `env` option of `HMD.create`. `$.env` from
