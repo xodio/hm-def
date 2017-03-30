@@ -64,4 +64,16 @@ describe('def', () => {
     assert.deepEqual(foo(' world', 'Hello'), 'Hello world');
     assert.throws(() => foo(42, 13), 'requires ‘a’ to satisfy the Semigroup type-class constraint');
   });
+
+  it('should work with manually curried functions', () => {
+    const foo = def.curried(
+      'foo :: Number -> Number -> Number -> Number',
+      x => y => z => x + y + z,
+    );
+
+    assert.strictEqual(foo(1)(2)(3), 6);
+    assert.strictEqual(foo(1, 2, 3), 6);
+    assert.strictEqual(foo(1, 2)(3), 6);
+    assert.strictEqual(foo(1)(2, 3), 6);
+  });
 });
