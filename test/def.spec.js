@@ -1,4 +1,5 @@
 
+import R from 'ramda';
 import $ from 'sanctuary-def';
 import Z from 'sanctuary-type-classes';
 import { assert } from 'chai';
@@ -75,5 +76,19 @@ describe('def', () => {
     assert.strictEqual(foo(1, 2, 3), 6);
     assert.strictEqual(foo(1, 2)(3), 6);
     assert.strictEqual(foo(1)(2, 3), 6);
+  });
+});
+
+describe('README examples', () => {
+  it('should work with manually curried functions', () => {
+    const rejectValues = def.curried(
+      'rejectValues :: [a] -> [a] -> [a]',
+      badValues => R.reject(R.contains(R.__, badValues))
+    );
+
+    const rejectAbuse = rejectValues(['foo', 'qux']);
+    const result = rejectAbuse(['qux', 'mux', 'bar', 'foo', 'baz']);
+
+    assert.deepEqual(result, ['mux', 'bar', 'baz']);
   });
 });

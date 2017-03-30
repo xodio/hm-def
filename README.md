@@ -186,6 +186,36 @@ add42(13);
 // 55
 ```
 
+Although while programming in point-free style it is often more desirable to
+curry functions by hand. In these cases you can use `def.curried` and provide
+a manually curried function:
+
+```javascript
+import R from 'ramda';
+
+const rejectValues = def.curried(
+  'rejectValues :: [a] -> [a] -> [a]',
+  badValues => filterable => R.reject(x => R.constaints(x, badValues), filterable)
+);
+
+// or the same in point-free fashion
+const rejectValues = def.curried(
+  'rejectValues :: [a] -> [a] -> [a]',
+  badValues => R.reject(R.contains(R.__, badValues))
+);
+
+const rejectAbuse = rejectValues(['foo', 'qux']);
+
+rejectAbuse([
+  'qux',
+  'mux',
+  'bar',
+  'foo',
+  'baz',
+]);
+// ['mux', 'bar', 'baz']
+```
+
 License
 -------
 
