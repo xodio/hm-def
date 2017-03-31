@@ -39,6 +39,19 @@ const uncurry2 = R.uncurryN(2);
 // :: String -> String
 const stripNamespace = R.compose(R.last, R.split('/'));
 
+// :: Number -> String
+const spellNumber = x => ({
+  1: 'one',
+  2: 'two',
+  3: 'three',
+  4: 'four',
+  5: 'five',
+  6: 'six',
+  7: 'seven',
+  8: 'eight',
+  9: 'nine',
+}[x] || x.toString());
+
 //-----------------------------------------------------------------------------
 //
 // Type classes
@@ -98,6 +111,54 @@ const typeEq = R.propEq('type');
 // :: SignatureEntry -> Boolean
 const hasChildren = R.compose(R.not, R.isEmpty, R.prop('children'));
 
+// Clones an object but do not flatten its prototype properties
+// as R.clone does
+// :: a -> a
+const cloneObjPreserveType = obj => {
+  let result = Object.create(Object.getPrototypeOf(obj));
+  const properties = Object.getOwnPropertyNames(obj);
+  for (let i = 0; i < properties.length; i += 1) {
+    result[properties[i]] = obj[properties[i]];
+  }
+
+  return result;
+}
+
+// :: [Type] -> Type -> Type
+const substituteTypes = argTypes => type => R.compose(
+  R.reduce(
+    (t, [argKey, argType]) => {
+      // We’re in reducer, so we can cheat and mutate. The mutation is
+      // necessary (versus R.assoc) to preserve the type of `t`
+      t.types[argKey].type = argType;
+      return t;
+    },
+    cloneObjPreserveType(type)
+  ),
+  R.zip(R.__, argTypes),
+  R.tap(keys => {
+    const expected = keys.length;
+    const actual = argTypes.length;
+    if (expected !== actual) {
+      throw new TypeError(
+        `Type ${type.name} expects ${spellNumber(expected)} ` +
+        `argument${expected === 1 ? '' : 's'}, ` +
+        `got ${spellNumber(argTypes.length)}`
+      )
+    }
+  }),
+  R.prop('keys')
+)(type);
+
+// :: [Type] -> Type|Function -> Type
+const constructType = uncurry2(argTypes =>
+  R.ifElse(
+    R.is(Function),
+    R.apply(R.__, argTypes),
+    substituteTypes(argTypes)
+  )
+);
+
 // :: SignatureEntry -> Reader TypeMap Type
 const lookupType = entry => Reader((typeMap) => {
   const name = entry.text;
@@ -119,7 +180,7 @@ const Thunk = $.NullaryType('hm-def/Thunk', '', R.F);
 const convertTypeConstructor = entry => R.ifElse(
   hasChildren,
   R.compose(
-    lift2(R.apply)(lookupType(entry)),
+    lift2(constructType)(R.__, lookupType(entry)),
     convertTypes,
     children,
   ),
