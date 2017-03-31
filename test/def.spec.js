@@ -83,7 +83,7 @@ describe('README examples', () => {
   it('should have correct magnitude', () => {
     const magnitude = def(
       'magnitude :: [Number] -> Number',
-      xs => Math.sqrt(xs.reduce((acc, x) => acc + x * x, 0))
+      xs => Math.sqrt(xs.reduce((acc, x) => acc + (x * x), 0)),
     );
 
     const result = magnitude([3, 4, 0]);
@@ -98,8 +98,8 @@ describe('README examples', () => {
           min: Math.min(x, acc.min),
           max: Math.max(x, acc.max),
         }),
-        { min: Infinity, max: -Infinity }
-      )
+        { min: Infinity, max: -Infinity },
+      ),
     );
 
     const result = minMax([1, 4, 6, 3, 4, 5, -3, 4]);
@@ -111,15 +111,15 @@ describe('README examples', () => {
       'occurrences :: [String] -> StrMap Number',
       xs => xs.reduce(
         (acc, x) => {
-          acc[x] = (acc[x] || 0) + 1;
+          acc[x] = (acc[x] || 0) + 1; // eslint-disable-line
           return acc;
         },
-        {}
-      )
+        {},
+      ),
     );
 
     const result = occurrences([
-      'foo', 'bar', 'bar', 'baz', 'bar', 'qux', 'foo'
+      'foo', 'bar', 'bar', 'baz', 'bar', 'qux', 'foo',
     ]);
 
     assert.deepEqual(result, {
@@ -133,7 +133,7 @@ describe('README examples', () => {
   it('should work with manually curried functions', () => {
     const rejectValues = def.curried(
       'rejectValues :: [a] -> [a] -> [a]',
-      badValues => R.reject(R.contains(R.__, badValues))
+      badValues => R.reject(R.contains(R.__, badValues)),
     );
 
     const rejectAbuse = rejectValues(['foo', 'qux']);

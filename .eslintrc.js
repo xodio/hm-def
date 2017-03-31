@@ -19,4 +19,10 @@ module.exports = {
     after: true,
     afterEach: true,
   },
+
+  rules: {
+    'no-underscore-dangle': ['error', {
+      allow: ["__"], /* Ramda’s R.__ */
+    }]
+  },
 };

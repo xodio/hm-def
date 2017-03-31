@@ -114,7 +114,8 @@ const hasChildren = R.compose(R.not, R.isEmpty, R.prop('children'));
 // Clones an object but do not flatten its prototype properties
 // as R.clone does
 // :: a -> a
-const cloneObjPreserveType = obj => {
+const cloneObjPreserveType = (obj) => {
+  // eslint-disable-next-line prefer-const
   let result = Object.create(Object.getPrototypeOf(obj));
   const properties = Object.getOwnPropertyNames(obj);
   for (let i = 0; i < properties.length; i += 1) {
@@ -122,7 +123,7 @@ const cloneObjPreserveType = obj => {
   }
 
   return result;
-}
+};
 
 // :: [Type] -> Type -> Type
 const substituteTypes = argTypes => type => R.compose(
@@ -130,24 +131,25 @@ const substituteTypes = argTypes => type => R.compose(
     (t, [argKey, argType]) => {
       // We’re in reducer, so we can cheat and mutate. The mutation is
       // necessary (versus R.assoc) to preserve the type of `t`
+      // eslint-disable-next-line no-param-reassign
       t.types[argKey].type = argType;
       return t;
     },
-    cloneObjPreserveType(type)
+    cloneObjPreserveType(type),
   ),
   R.zip(R.__, argTypes),
-  R.tap(keys => {
+  R.tap((keys) => {
     const expected = keys.length;
     const actual = argTypes.length;
     if (expected !== actual) {
       throw new TypeError(
         `Type ${type.name} expects ${spellNumber(expected)} ` +
         `argument${expected === 1 ? '' : 's'}, ` +
-        `got ${spellNumber(argTypes.length)}`
-      )
+        `got ${spellNumber(argTypes.length)}`,
+      );
     }
   }),
-  R.prop('keys')
+  R.prop('keys'),
 )(type);
 
 // :: [Type] -> Type|Function -> Type
@@ -155,8 +157,8 @@ const constructType = uncurry2(argTypes =>
   R.ifElse(
     R.is(Function),
     R.apply(R.__, argTypes),
-    substituteTypes(argTypes)
-  )
+    substituteTypes(argTypes),
+  ),
 );
 
 // :: SignatureEntry -> Reader TypeMap Type
