@@ -295,6 +295,14 @@ rejectAbuse([
 // ['mux', 'bar', 'baz']
 ```
 
+Changelog
+---------
+
+### 0.2.0
+
+* Add `def.curried`
+* Fix errors when using some non-nullary types like built-in `Array` or `StrMap`
+
 License
 -------
 
