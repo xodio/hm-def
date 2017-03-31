@@ -121,6 +121,32 @@ minMax([1, 4, 6, 3, 4, 5, -3, 4]);
 // { min: -3, max: 6 }
 ```
 
+### Maps
+
+To describe a map of homogenous data you can use `StrMap` type:
+
+```javascript
+const occurrences = def(
+  'occurrences :: [String] -> StrMap Number',
+  xs => xs.reduce(
+    (acc, x) => {
+      // a bit of dirty local mutation
+      acc[x] = (acc[x] || 0) + 1;
+      return acc;
+    },
+    {}
+  )
+);
+
+occurrences(['foo', 'bar', 'bar', 'baz', 'bar', 'qux', 'foo']);
+// {
+//   foo: 2,
+//   bar: 3,
+//   baz: 1,
+//   qux: 1,
+// }
+```
+
 ### Types available
 
 You pass type definitions with `env` option of `HMD.create`. `$.env` from

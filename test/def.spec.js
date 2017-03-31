@@ -106,6 +106,30 @@ describe('README examples', () => {
     assert.deepEqual(result, { min: -3, max: 6 });
   });
 
+  it('should have correct occurrences', () => {
+    const occurrences = def(
+      'occurrences :: [String] -> StrMap Number',
+      xs => xs.reduce(
+        (acc, x) => {
+          acc[x] = (acc[x] || 0) + 1;
+          return acc;
+        },
+        {}
+      )
+    );
+
+    const result = occurrences([
+      'foo', 'bar', 'bar', 'baz', 'bar', 'qux', 'foo'
+    ]);
+
+    assert.deepEqual(result, {
+      foo: 2,
+      bar: 3,
+      baz: 1,
+      qux: 1,
+    });
+  });
+
   it('should work with manually curried functions', () => {
     const rejectValues = def.curried(
       'rejectValues :: [a] -> [a] -> [a]',
