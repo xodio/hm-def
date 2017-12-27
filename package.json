@@ -1,6 +1,6 @@
 {
   "name": "hm-def",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Runtime type checking with Hindley Milner signatures",
   "repository": "https://github.com/xodio/hm-def",
   "main": "dist/index.js",
@@ -13,9 +13,9 @@
   "author": "XOD LLC",
   "license": "MIT",
   "dependencies": {
-    "hm-parser": "^0.1.3",
-    "ramda": "^0.23.0",
-    "ramda-fantasy": "^0.7.0",
+    "hm-parser": "^0.1.4",
+    "ramda": "^0.24.1",
+    "ramda-fantasy": "^0.8.0",
     "sanctuary-def": "^0.9.0"
   },
   "devDependencies": {

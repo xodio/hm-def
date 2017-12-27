@@ -1,5 +1,5 @@
 
-import R from 'ramda';
+import * as R from 'ramda';
 import { Reader } from 'ramda-fantasy';
 import HMP from 'hm-parser';
 import $ from 'sanctuary-def';
