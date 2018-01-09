@@ -58,13 +58,13 @@ sum(42, 13);
 
 sum('42', 13);
 // TypeError: Invalid value
-// 
+//
 // foo :: Number -> Number -> Number
 //        ^^^^^^
 //          1
-// 
+//
 // 1)  "42" :: String
-// 
+//
 // The value at position 1 is not a member of ‘Number’.
 ```
 
@@ -236,13 +236,13 @@ concat(' world', 'Hello')
 
 concat(42, 13)
 // TypeError: Type-class constraint violation
-// 
+//
 // foo :: Semigroup a => a -> a -> a
 //        ^^^^^^^^^^^    ^
 //                       1
-// 
+//
 // 1)  42 :: Number
-// 
+//
 // ‘foo’ requires ‘a’ to satisfy the Semigroup type-class constraint; the value
 // at position 1 does not.
 ```
@@ -297,6 +297,14 @@ rejectAbuse([
 
 Changelog
 ---------
+
+### 0.2.2
+
+* Update `sanctuary-def` dependency to version 0.14.0
+
+### 0.2.1
+
+* Update `ramda` dependency to version 0.24.1
 
 ### 0.2.0
 
