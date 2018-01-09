@@ -45,14 +45,14 @@ describe('def', () => {
 
   it('should work with unary type variables', () => {
     const foo = def(
-      'foo :: (a -> b) -> f a -> f b',
+      'foo :: Functor f => (a -> b) -> f a -> f b',
       (fn, x) => x.map(e => fn(e)),
     );
 
     const cube = x => x * x * x;
 
     assert.deepEqual(foo(cube, [1, 2, 3]), [1, 8, 27]);
-    assert.throws(() => foo(cube, 'im-not-an-unary-type'), 'Type-variable constraint violation');
+    assert.throws(() => foo(cube, 'im-not-an-unary-type'), 'Type-class constraint violation');
   });
 
   it('should work with type class constraints', () => {
