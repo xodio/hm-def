@@ -270,8 +270,11 @@ const shortName = R.compose(
   ensureParametrized,
 );
 
-// :: [Type] -> TypeMap
-const indexTypes = R.indexBy(shortName);
+// :: [(Type... -> Type)] -> [Type] -> TypeMap
+const indexTypes = R.compose(
+  R.indexBy(shortName),
+  R.concat
+);
 
 //-----------------------------------------------------------------------------
 //
@@ -284,8 +287,8 @@ const indexTypes = R.indexBy(shortName);
 //      constraints :: StrMap TypeClass,
 //      types :: [Type]
 //    }
-export const resolve = R.curry((typeClasses, env, signature) => {
-  const typeMap = indexTypes(env);
+export const resolve = R.curry((typeClasses, typeConstructors, env, signature) => {
+  const typeMap = indexTypes(typeConstructors, env);
   const typeClassMap = indexTypeClasses(typeClasses);
   const sig = HMP.parse(signature);
   const entries = sig.type.children;
