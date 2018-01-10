@@ -152,13 +152,40 @@ const substituteTypes = argTypes => type => R.compose(
   R.prop('keys'),
 )(type);
 
+//  :: Type -> (Type -> Type)
+const fromUnaryType = t => $.UnaryType(t.name, t.url, t._test, t.types.$1.extractor);
+//  :: Type -> (Type -> Type -> Type)
+const fromBinaryType = t => $.BinaryType(t.name, t.url, t._test, t.types.$1.extractor, t.types.$2.extractor);
+
+// :: Type -> Boolean
+const isUnaryType = R.propEq('type', 'UNARY');
+// :: Type -> Boolean
+const isBinaryType = R.propEq('type', 'BINARY');
+
+// :: [Type] -> Type -> Type
+const constructNewTypeFromType = argTypes => type => R.compose(
+  R.apply(R.__, argTypes),
+  R.cond([
+    [isUnaryType, fromUnaryType],
+    [isBinaryType, fromBinaryType],
+    [R.T, (x) => {
+      // Actually it won't happen.
+      // This is to ensure a clear error if one day sactuary-def change constants or something else.
+      throw new TypeError(
+        `Type ${type.name} should be recreated with Types: ${R.map(R.prop('name'), argTypes)} ` +
+        `but it haven't got a proper function recreator for type ${type.type}.`
+      );
+    }]
+  ])
+)(type);
+
 // :: [Type] -> Type|Function -> Type
 const constructType = uncurry2(argTypes =>
   R.ifElse(
     R.is(Function),
     R.apply(R.__, argTypes),
-    substituteTypes(argTypes),
-  ),
+    constructNewTypeFromType(argTypes)
+  )
 );
 
 // :: SignatureEntry -> Reader TypeMap Type
@@ -270,11 +297,8 @@ const shortName = R.compose(
   ensureParametrized,
 );
 
-// :: [(Type... -> Type)] -> [Type] -> TypeMap
-const indexTypes = R.compose(
-  R.indexBy(shortName),
-  R.concat
-);
+// :: [Type] -> TypeMap
+const indexTypes = R.indexBy(shortName);
 
 //-----------------------------------------------------------------------------
 //
@@ -287,8 +311,8 @@ const indexTypes = R.compose(
 //      constraints :: StrMap TypeClass,
 //      types :: [Type]
 //    }
-export const resolve = R.curry((typeClasses, typeConstructors, env, signature) => {
-  const typeMap = indexTypes(typeConstructors, env);
+export const resolve = R.curry((typeClasses, env, signature) => {
+  const typeMap = indexTypes(env);
   const typeClassMap = indexTypeClasses(typeClasses);
   const sig = HMP.parse(signature);
   const entries = sig.type.children;

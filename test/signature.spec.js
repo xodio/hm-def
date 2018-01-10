@@ -29,68 +29,68 @@ function logHMP(sig) { console.log(JSON.stringify(HMP.parse(sig), null, 2)); }
 
 describe('Function name', () => {
   it('should be extracted', () => {
-    const { name } = resolve([], [], $.env, 'foo :: Number -> Number');
+    const { name } = resolve([], $.env, 'foo :: Number -> Number');
     assert.strictEqual(name, 'foo');
   });
 });
 
 describe('Type constraints', () => {
   it('should return {} if not specified', () => {
-    const { constraints } = resolve([], [], $.env, 'foo :: Number -> Number');
+    const { constraints } = resolve([], $.env, 'foo :: Number -> Number');
     assert.deepEqual(constraints, {});
   });
 
   it('should resolve single constraint', () => {
     const tcs = [Z.Monoid];
-    const { constraints } = resolve(tcs, [], $.env, 'foo :: Monoid a => a -> a');
+    const { constraints } = resolve(tcs, $.env, 'foo :: Monoid a => a -> a');
     assert.deepEqual(constraints, { a: [Z.Monoid] });
   });
 });
 
 describe('Parameter types', () => {
   it('should resolve built-in types', () => {
-    const { types } = resolve([], [], $.env, 'foo :: Number -> String');
+    const { types } = resolve([], $.env, 'foo :: Number -> String');
     assertDeepEqual(types, [$.Number, $.String]);
   });
 
   it('should resolve user types', () => {
     const Widget = $.NullaryType('Widget', 'http://example.com/Widget', R.T);
-    const env = R.append(Widget, $.env);
-    const { types } = resolve([], [], env, 'foo :: Widget -> String');
+    const env = $.env.concat([Widget]);
+    const { types } = resolve([], env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
 
   it('should resolve namespaced user types', () => {
     const Widget = $.NullaryType('x/y/z/Widget', 'http://example.com/Widget', R.T);
-    const env = R.append(Widget, $.env);
-    const { types } = resolve([], [], env, 'foo :: Widget -> String');
+    const env = $.env.concat([Widget]);
+    const { types } = resolve([], env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
 
   it('should resolve lists', () => {
-    const { types } = resolve([], [], $.env, 'foo :: [Number] -> [String]');
+    const { types } = resolve([], $.env, 'foo :: [Number] -> [String]');
     assertDeepEqual(types, [$.Array($.Number), $.Array($.String)]);
   });
 
   it('should resolve functions', () => {
-    const { types } = resolve([], [], $.env, 'foo :: Number -> (Number -> Number)');
+    const { types } = resolve([], $.env, 'foo :: Number -> (Number -> Number)');
     assertDeepEqual(types, [$.Number, $.Function([$.Number, $.Number])]);
   });
 
   it('should resolve unary types', () => {
-    const { types } = resolve([], [], $.env, 'foo :: Number -> StrMap Number');
+    const { types } = resolve([], $.env, 'foo :: Number -> StrMap Number');
     assertDeepEqual(types, [$.Number, $.StrMap($.Number)]);
   });
 
   it('should bark on wrong number of arguments', () => {
-    const define = () => resolve([], [], $.env, 'foo :: Number -> StrMap Number Number');
-    assert.throws(define, 'expects one argument, got two');
+    const define = () => resolve([], $.env, 'foo :: Number -> StrMap Number Number');
+    assert.throws(define, 'expected at most one argument but received two arguments');
   });
 
   it('should resolve typevars', () => {
     const a = $.TypeVariable('a');
     const b = $.TypeVariable('b');
-    const { types } = resolve([], [], $.env, 'foo :: a -> b -> a');
+    const { types } = resolve([], $.env, 'foo :: a -> b -> a');
     assertDeepEqual(types, [a, b, a]);
   });
 
@@ -101,7 +101,10 @@ describe('Parameter types', () => {
       R.T,
       R.always([]),
     );
-    const { types } = resolve([], [Maybe], $.env, 'foo :: Maybe String -> String');
+    const env = $.env.concat([
+      Maybe($.Unknown),
+    ]);
+    const { types } = resolve([], env, 'foo :: Maybe String -> String');
     assertDeepEqual(types, [Maybe($.String), $.String]);
   });
 
@@ -113,18 +116,20 @@ describe('Parameter types', () => {
       R.always([]),
       R.always([]),
     );
-
-    const { types } = resolve([], [Either], $.env, 'foo :: Either String Number -> String');
+    const env = $.env.concat([
+      Either($.Unknown, $.Unknown),
+    ]);
+    const { types } = resolve([], env, 'foo :: Either String Number -> String');
     assertDeepEqual(types, [Either($.String, $.Number), $.String]);
   });
 
   it('should resolve thunks', () => {
-    const { types } = resolve([], [], $.env, 'foo :: () -> Number');
+    const { types } = resolve([], $.env, 'foo :: () -> Number');
     assertDeepEqual(types, [$.Number]);
   });
 
   it('should resolve records', () => {
-    const { types } = resolve([], [], $.env, 'foo :: { value :: Number } -> Number');
+    const { types } = resolve([], $.env, 'foo :: { value :: Number } -> Number');
     assertDeepEqual(types, [$.RecordType({ value: $.Number }), $.Number]);
   });
 
@@ -133,7 +138,7 @@ describe('Parameter types', () => {
     const b = $.TypeVariable('b');
     const f = $.UnaryTypeVariable('f');
     const tcs = [Z.Functor];
-    const { types } = resolve(tcs, [], $.env, 'foo :: Functor f => (a -> b) -> f a -> f b');
+    const { types } = resolve(tcs, $.env, 'foo :: Functor f => (a -> b) -> f a -> f b');
     assertDeepEqual(types, [$.Function([a, b]), f(a), f(b)]);
   });
 });

@@ -5,7 +5,7 @@ import Z from 'sanctuary-type-classes';
 import { assert } from 'chai';
 import HMD from '../src/index';
 
-const Map = $.BinaryType(
+const $Map = $.BinaryType(
   'Map',
   'someurl',
   R.is(Object),
@@ -13,12 +13,19 @@ const Map = $.BinaryType(
   R.values,
 );
 
+const $Wrapper = $.UnaryType(
+  'Wrapper',
+  'someurl',
+  R.both(R.is(Object), R.has('value')),
+  R.compose(R.of, R.prop('value'))
+);
+
 const def = HMD.create({
   checkTypes: true,
-  env: $.env,
-  typeConstructors: [
-    Map,
-  ],
+  env: $.env.concat([
+    $Map($.Unknown, $.Unknown),
+    $Wrapper($.Unknown),
+  ]),
   typeClasses: [
     Z.Functor,
     Z.Semigroup,
@@ -26,33 +33,6 @@ const def = HMD.create({
 });
 
 describe('def', () => {
-  it('should work with typeConstructors', () => {
-    const foo = def(
-      'foo :: Map String Number -> Map String String',
-      R.map(R.toString)
-    );
-    assert.deepEqual(
-      foo({ a: 5, b: 7 }),
-      { a: '5', b: '7' }
-    );
-    assert.throws(() => foo({ a: false }), 'The value at position 1 is not a member of ‘Number’');
-    assert.throws(() => foo(null), 'The value at position 1 is not a member of ‘Map String Number’');
-
-    const bar = def(
-      'bar :: Map String (Map String Number) -> Map String Boolean',
-      R.map(R.compose(
-        R.gt(3),
-        R.sum,
-        R.values
-      ))
-    );
-    assert.deepEqual(
-      bar({ a: { x: 0, y: 1 }, b: { x: 1, y: 3 } }),
-      { a: true, b: false }
-    );
-    assert.throws(() => bar({ a: false }), 'The value at position 1 is not a member of ‘Map String Number’');
-    assert.throws(() => bar(null), 'The value at position 1 is not a member of ‘Map String (Map String Number)’');
-  });
   it('should work with unary functions', () => {
     const foo = def(
       'foo :: Number -> String',
@@ -114,6 +94,55 @@ describe('def', () => {
     assert.strictEqual(foo(1, 2, 3), 6);
     assert.strictEqual(foo(1, 2)(3), 6);
     assert.strictEqual(foo(1)(2, 3), 6);
+  });
+
+  it('should work with users UnaryTypes', () => {
+    const foo = def(
+      'foo :: Wrapper Number -> Number',
+      R.prop('value')
+    );
+    assert.equal(foo({ value: 10 }), 10);
+    assert.throws(() => foo({}), 'The value at position 1 is not a member of ‘Wrapper Number’');
+    assert.throws(() => foo(null), 'The value at position 1 is not a member of ‘Wrapper Number’');
+    assert.throws(() => foo({ value: 'hello' }), 'The value at position 1 is not a member of ‘Number’');
+
+    const bar = def(
+      'bar :: Wrapper Number -> Wrapper String',
+      R.over(R.lensProp('value'), R.toString)
+    );
+    assert.deepEqual(bar({ value: 10 }), { value: '10' });
+    assert.throws(() => bar({}), 'The value at position 1 is not a member of ‘Wrapper Number’');
+    assert.throws(() => bar(null), 'The value at position 1 is not a member of ‘Wrapper Number’');
+    assert.throws(() => bar({ value: 'hello' }), 'The value at position 1 is not a member of ‘Number’');
+  });
+
+  it('should work with users BinaryTypes', () => {
+    const foo = def(
+      'foo :: Map String Number -> Map String String',
+      R.map(R.toString)
+    );
+    assert.deepEqual(foo({ a: 5, b: 7 }), { a: '5', b: '7' });
+    assert.throws(() => foo({ a: false }), 'The value at position 1 is not a member of ‘Number’');
+    assert.throws(() => foo(null), 'The value at position 1 is not a member of ‘Map String Number’');
+
+    const bar = def(
+      'bar :: Map String (Map String Number) -> Map String Boolean',
+      R.map(R.compose(
+        R.gt(3),
+        R.sum,
+        R.values
+      ))
+    );
+    assert.deepEqual(bar({ a: { x: 0, y: 1 }, b: { x: 1, y: 3 } }), { a: true, b: false });
+    assert.throws(() => bar({ a: false }), 'The value at position 1 is not a member of ‘Map String Number’');
+    assert.throws(() => bar(null), 'The value at position 1 is not a member of ‘Map String (Map String Number)’');
+
+    const buzz = def(
+      'buzz :: Map a b -> Map a a',
+      R.map(R.toString)
+    );
+    assert.deepEqual(buzz({ a: 1, b: 2 }), { a: '1', b: '2' });
+    assert.throws(() => buzz(null), 'The value at position 1 is not a member of ‘Map a b’');
   });
 });
 

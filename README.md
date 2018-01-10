@@ -251,8 +251,9 @@ concat(42, 13)
 ### Type constructors
 _Added in v0.3.0_
 
-If you need type constructors, that could have more than a fixed number of Type
-combinations, you should not add them into `env`, use `typeConstructors` field instead.
+If you need UnaryType or BinaryType of something you should add them into `env`
+with `$.Unknown` types in it. Then `hm-def` will recreate specific types when you
+will define your functions.
 
 ```javascript
 const Either = $.BinaryType(
@@ -266,10 +267,9 @@ const Either = $.BinaryType(
 
 const def = HMD.create({
   checkTypes: true,
-  env: $.env,
-  typeConstructors: [
-    Either,
-  ],
+  env: $.env.concat([
+    Either($.Unknown, $.Unknown),
+  ]),
 });
 
 // Now we can just define functions as usual:
@@ -283,6 +283,7 @@ const foo = def(
 
 foo(S.Either.Right(4)); // Either.Right('It greater than or equal 3')
 foo(S.Either.Right(1)); // Either.Left('It less than 3')
+foo(S.Either.Right('hello')); // TypeError: The value at position 1 is not a member of ‘Number’
 foo(1); // TypeError: The value at position 1 is not a member of ‘Either Number String’
 ```
 
@@ -340,17 +341,13 @@ Changelog
 ### 0.3.0
 
 * Update `sanctuary-def` dependency to version 0.14.0
-* BREAKING :exclamation: resolve type constructors separately of types to work properly with
-  Unary/Binary types without creating Cartesian product of all possible types in the `env`.
-  Needed type will be created on function definition. (How to)[#type-constructors]
+* BREAKING :exclamation: All Unary/Binary Types with variable types inside should be
+  specified in `env` with `$.Unknown` types. Then, when you define functions, `hm-def`
+  will recreate specific types for these functions. (See more)[#type-constructors]
 
   Since version 0.10.0 of `sactuary-def` environments must be of type `Array Type`.
-  So it must not contain type constructors anymore, like Unary/BinaryType of something.
+  So it must not contain type constructors anymore.
   (PR #124)[https://github.com/sanctuary-js/sanctuary-def/pull/124]
-
-  (Documentation told)[https://github.com/sanctuary-js/sanctuary-def/pull/124/files#diff-168726dbe96b3ce427e7fedce31bb0bcR40]
-  that you have to define a fixed number of concrete types in the env. But you could
-  use type constructors when defining your functions (without adding it into environments)[https://github.com/sanctuary-js/sanctuary-def/pull/124/files#diff-168726dbe96b3ce427e7fedce31bb0bcR40].
 
 ### 0.2.1
 
