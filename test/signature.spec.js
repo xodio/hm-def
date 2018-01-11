@@ -84,7 +84,7 @@ describe('Parameter types', () => {
 
   it('should bark on wrong number of arguments', () => {
     const define = () => resolve([], $.env, 'foo :: Number -> StrMap Number Number');
-    assert.throws(define, 'expected at most one argument but received two arguments');
+    assert.throws(define, 'expects one argument, got two');
   });
 
   it('should resolve typevars', () => {
