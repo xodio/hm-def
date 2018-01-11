@@ -55,14 +55,14 @@ describe('Parameter types', () => {
 
   it('should resolve user types', () => {
     const Widget = $.NullaryType('Widget', 'http://example.com/Widget', R.T);
-    const env = R.append(Widget, $.env);
+    const env = $.env.concat([Widget]);
     const { types } = resolve([], env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
 
   it('should resolve namespaced user types', () => {
     const Widget = $.NullaryType('x/y/z/Widget', 'http://example.com/Widget', R.T);
-    const env = R.append(Widget, $.env);
+    const env = $.env.concat([Widget]);
     const { types } = resolve([], env, 'foo :: Widget -> String');
     assertDeepEqual(types, [Widget, $.String]);
   });
@@ -101,8 +101,9 @@ describe('Parameter types', () => {
       R.T,
       R.always([]),
     );
-
-    const env = R.append(Maybe, $.env);
+    const env = $.env.concat([
+      Maybe($.Unknown),
+    ]);
     const { types } = resolve([], env, 'foo :: Maybe String -> String');
     assertDeepEqual(types, [Maybe($.String), $.String]);
   });
@@ -115,8 +116,9 @@ describe('Parameter types', () => {
       R.always([]),
       R.always([]),
     );
-
-    const env = R.append(Either, $.env);
+    const env = $.env.concat([
+      Either($.Unknown, $.Unknown),
+    ]);
     const { types } = resolve([], env, 'foo :: Either String Number -> String');
     assertDeepEqual(types, [Either($.String, $.Number), $.String]);
   });

@@ -1,4 +1,4 @@
-Hinley Milner Definitions
+Hindley Milner Definitions
 =========================
 
 The `hm-def` package allows you to enforce runtime type checking for JavaScript
@@ -247,6 +247,46 @@ concat(42, 13)
 // at position 1 does not.
 ```
 
+<a name="type-constructors"></a>
+### Type constructors
+_Added in v0.3.0_
+
+If you need UnaryType or BinaryType of something you should add them into `env`
+with `$.Unknown` types in it. Then `hm-def` will recreate specific types when you
+will define your functions.
+
+```javascript
+const Either = $.BinaryType(
+  'my-package/Either',
+  'http://example.com/my-package#Either',
+  x => x != null && x['@@type'] === 'my-package/Either'
+  either => (either.isLeft ? [either.value] : []),
+  either => (either.isRight ? [either.value] : [])
+);
+// Either is a function `Either :: Type -> Type -> Type`,
+
+const def = HMD.create({
+  checkTypes: true,
+  env: $.env.concat([
+    Either($.Unknown, $.Unknown),
+  ]),
+});
+
+// Now we can just define functions as usual:
+const foo = def(
+  'foo :: Either Number String -> Either String String',
+  (x) => x.chain((val) => {
+    if (val >= 3) return S.Either.Right('It greater than or equal 3');
+    return S.Either.Left('It less than 3');
+  })
+);
+
+foo(S.Either.Right(4)); // Either.Right('It greater than or equal 3')
+foo(S.Either.Right(1)); // Either.Left('It less than 3')
+foo(S.Either.Right('hello')); // TypeError: The value at position 1 is not a member of ‘Number’
+foo(1); // TypeError: The value at position 1 is not a member of ‘Either Number String’
+```
+
 ### Currying
 
 Thanks to `sanctuary-def` functions defined with `def` are automatically
@@ -298,9 +338,16 @@ rejectAbuse([
 Changelog
 ---------
 
-### 0.2.2
+### 0.3.0
 
 * Update `sanctuary-def` dependency to version 0.14.0
+* BREAKING :exclamation: All Unary/Binary Types with variable types inside should be
+  specified in `env` with `$.Unknown` types. Then, when you define functions, `hm-def`
+  will recreate specific types for these functions. (See more)[#type-constructors]
+
+  Since version 0.10.0 of `sactuary-def` environments must be of type `Array Type`.
+  So it must not contain type constructors anymore.
+  (PR #124)[https://github.com/sanctuary-js/sanctuary-def/pull/124]
 
 ### 0.2.1
 

@@ -111,54 +111,56 @@ const typeEq = R.propEq('type');
 // :: SignatureEntry -> Boolean
 const hasChildren = R.compose(R.not, R.isEmpty, R.prop('children'));
 
-// Clones an object but do not flatten its prototype properties
-// as R.clone does
-// :: a -> a
-const cloneObjPreserveType = (obj) => {
-  // eslint-disable-next-line prefer-const
-  let result = Object.create(Object.getPrototypeOf(obj));
-  const properties = Object.getOwnPropertyNames(obj);
-  for (let i = 0; i < properties.length; i += 1) {
-    result[properties[i]] = obj[properties[i]];
+//  :: Type -> (Type -> Type)
+const fromUnaryType = t => $.UnaryType(
+  t.name,
+  t.url,
+  t._test, // eslint-disable-line no-underscore-dangle
+  t.types.$1.extractor
+);
+//  :: Type -> (Type -> Type -> Type)
+const fromBinaryType = t => $.BinaryType(
+  t.name,
+  t.url,
+  t._test, // eslint-disable-line no-underscore-dangle
+  t.types.$1.extractor,
+  t.types.$2.extractor
+);
+
+// :: (Type, [Type]) -> ()
+const checkTypeArity = (type, argTypes) => {
+  const expected = type.keys.length;
+  const actual = argTypes.length;
+  if (expected !== actual) {
+    throw new TypeError(
+      `Type ${type.name} expects ${spellNumber(expected)} ` +
+      `argument${expected === 1 ? '' : 's'}, ` +
+      `got ${spellNumber(argTypes.length)}`,
+    );
   }
-
-  return result;
 };
-
-// :: [Type] -> Type -> Type
-const substituteTypes = argTypes => type => R.compose(
-  R.reduce(
-    (t, [argKey, argType]) => {
-      // We’re in reducer, so we can cheat and mutate. The mutation is
-      // necessary (versus R.assoc) to preserve the type of `t`
-      // eslint-disable-next-line no-param-reassign
-      t.types[argKey].type = argType;
-      return t;
-    },
-    cloneObjPreserveType(type),
-  ),
-  R.zip(R.__, argTypes),
-  R.tap((keys) => {
-    const expected = keys.length;
-    const actual = argTypes.length;
-    if (expected !== actual) {
-      throw new TypeError(
-        `Type ${type.name} expects ${spellNumber(expected)} ` +
-        `argument${expected === 1 ? '' : 's'}, ` +
-        `got ${spellNumber(argTypes.length)}`,
-      );
-    }
-  }),
-  R.prop('keys'),
-)(type);
 
 // :: [Type] -> Type|Function -> Type
 const constructType = uncurry2(argTypes =>
   R.ifElse(
     R.is(Function),
     R.apply(R.__, argTypes),
-    substituteTypes(argTypes),
-  ),
+    (t) => {
+      checkTypeArity(t, argTypes);
+      switch (t.type) {
+        case 'BINARY':
+          return fromBinaryType(t)(argTypes[0], argTypes[1]);
+        case 'UNARY':
+          return fromUnaryType(t)(argTypes[0]);
+        default: {
+          throw new TypeError(
+            `Type ${t.name} should be recreated with Types: ${R.map(R.prop('name'), argTypes)} ` +
+            `but it haven't got a proper function recreator for type ${t.type}.`
+          );
+        }
+      }
+    }
+  )
 );
 
 // :: SignatureEntry -> Reader TypeMap Type
