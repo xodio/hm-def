@@ -1312,9 +1312,9 @@ he@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
-hm-parser@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/hm-parser/-/hm-parser-0.1.4.tgz#a326f425ef3eacea46057f5cf7bd60e53e3d4283"
+hm-parser@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/hm-parser/-/hm-parser-0.1.5.tgz#d0ceae90f74bf1a8200789730b29c2a273e986eb"
   dependencies:
     nearley "^2.7.12"
     ramda "^0.24.1"
