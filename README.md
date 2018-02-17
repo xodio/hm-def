@@ -345,9 +345,9 @@ Changelog
   specified in `env` with `$.Unknown` types. Then, when you define functions, `hm-def`
   will recreate specific types for these functions. (See more)[#type-constructors]
 
-  Since version 0.10.0 of `sactuary-def` environments must be of type `Array Type`.
+  Since version 0.10.0 of `sanctuary-def` environments must be of type `Array Type`.
   So it must not contain type constructors anymore.
-  (PR #124)[https://github.com/sanctuary-js/sanctuary-def/pull/124]
+  ([sanctuary-js/sanctuary-def#124](https://github.com/sanctuary-js/sanctuary-def/pull/124))
 
 ### 0.2.1
 
