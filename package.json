@@ -32,10 +32,11 @@
     "@babel/register": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "chai": "^3.5.0",
-    "eslint": "^3.15.0",
-    "eslint-config-airbnb-base": "^11.1.0",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint": "5.3.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
     "mocha": "^3.2.0",
+    "sanctuary-style": "^2.0.0",
     "sanctuary-type-classes": "^7.1.1",
     "xyz": "3.0.x"
   }
