@@ -22,9 +22,11 @@
   "dependencies": {
     "fantasy-land": "^3.5.0",
     "hm-parser": "^0.1.5",
-    "ramda": "^0.24.1",
+    "lodash.cond": "^4.5.2",
+    "lodash.frompairs": "^4.0.1",
+    "mem": "^4.0.0",
     "sanctuary": "^0.15.0",
-    "sanctuary-def": "^0.14.0",
+    "sanctuary-def": "^0.18.1",
     "sanctuary-show": "^1.0.0"
   },
   "devDependencies": {
@@ -41,7 +43,7 @@
     "jsverify": "^0.8.3",
     "mocha": "^5.2.0",
     "sanctuary-style": "^2.0.0",
-    "sanctuary-type-classes": "^7.1.1",
+    "sanctuary-type-classes": "^9.0.0",
     "xyz": "3.0.x"
   }
 }
