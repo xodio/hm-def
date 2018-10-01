@@ -1,5 +1,4 @@
-Hindley Milner Definitions
-=========================
+# Hindley Milner Definitions
 
 The `hm-def` package allows you to enforce runtime type checking for JavaScript
 functions using Haskell-alike [Hindley
@@ -9,8 +8,7 @@ The `hm-def` is build on top of
 [sanctuary-def](https://github.com/sanctuary-js/sanctuary-def)
 and basically just a syntax sugar for it.
 
-Install
--------
+## Install
 
 ```bash
 $ yarn add hm-def
@@ -245,7 +243,9 @@ concat (42) (13)
 ```
 
 <a name="type-constructors"></a>
+
 ### Type constructors
+
 _Added in v0.3.0_
 
 If you need UnaryType or BinaryType of something you should add them into `env`
@@ -340,8 +340,7 @@ bar (1, 2);
 This is consistent with `sanctuary`'s way of currying, known as
 ["familiar currying"](https://github.com/sanctuary-js/sanctuary/issues/438).
 
-Changelog
----------
+## Changelog
 
 ### 0.3.0
 
@@ -363,7 +362,6 @@ Changelog
 * Add `def.curried`
 * Fix errors when using some non-nullary types like built-in `Array` or `StrMap`
 
-License
--------
+## License
 
 MIT
