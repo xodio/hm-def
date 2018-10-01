@@ -1,8 +1,8 @@
 
 import * as R from 'ramda';
-import { Reader } from 'ramda-fantasy';
 import HMP from 'hm-parser';
 import $ from 'sanctuary-def';
+import Reader from './Reader';
 
 /* We need a recursion, so: */
 /* eslint-disable no-use-before-define */
