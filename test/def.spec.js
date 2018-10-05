@@ -127,6 +127,15 @@ describe ('def', () => {
     assert.deepEqual (buzz ({a: 1, b: 2}), {a: '1', b: '2'});
     assert.throws (() => buzz (null), 'The value at position 1 is not a member of ‘Map a b’');
   });
+
+  it ('should work with higher order functions', () => {
+    const sig = 'foo :: (Number -> Number -> Number) -> Number';
+    const foo = def
+      (sig)
+      (a => b => c => a + b + c);
+
+    assert.equal (foo.toString (), sig);
+  });
 });
 
 describe ('README examples', () => {

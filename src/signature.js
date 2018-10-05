@@ -252,7 +252,10 @@ export const resolve = $ => {
   const convertFunction = memoize (S.pipe ([
     children,
     convertTypes,
-    S.unchecked.map ($.Function),
+    S.unchecked.map (types => S.reduce
+      (f => x => $.Function ([x, f]))
+      (types[types.length - 1])
+      (types.slice (0, -1))),
   ]));
 
   //    convertRecordField :: SignatureEntry

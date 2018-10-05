@@ -4,13 +4,14 @@ import Z from 'sanctuary-type-classes';
 import {assert} from 'chai';
 import {resolve} from '../src/signature';
 
+// assertSameType :: Type -> Type -> Undefined !
 const assertSameType = actual => expected => {
   assert.strictEqual (actual.name, expected.name);
   assert.strictEqual (actual.type, expected.type);
   assert.deepEqual (actual.keys, expected.keys);
   assert.deepEqual (actual.url, expected.url);
   expected.keys.forEach (key => {
-    assertSameType (actual.types[key].type, expected.types[key].type);
+    assertSameType (actual.types[key].type) (expected.types[key].type);
   });
 };
 
@@ -82,6 +83,27 @@ describe ('Parameter types', () => {
   it ('should resolve functions', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: Number -> (Number -> Number)');
     const lists = S.zip (types) ([$.Number, $.Function ([$.Number, $.Number])]);
+    assertTypePairs (lists);
+  });
+
+  it ('should resolve functions that return multi-arity functions', () => {
+    const {types} = resolve ($) ([]) ($.env) ('foo :: Number -> (Number -> Number -> Number)');
+    const lists = S.zip (types) ([$.Number, $.Function ([$.Number, $.Function ([$.Number, $.Number])])]);
+    assertTypePairs (lists);
+  });
+
+  it ('should resolve higher-order functions that take multi-arity functions', () => {
+    const {types} = resolve ($) ([]) ($.env) ('foo :: (Number -> Number -> Number) -> Number');
+    const lists = S.zip (types) ([
+      $.Function ([
+        $.Number,
+        $.Function ([
+          $.Number,
+          $.Number,
+        ]),
+      ]),
+      $.Number,
+    ]);
     assertTypePairs (lists);
   });
 
