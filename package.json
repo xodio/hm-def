@@ -7,11 +7,18 @@
   "scripts": {
     "build": "babel src/ -d dist/",
     "lint": "eslint src/ test/",
+    "release": "xyz --repo git@github.com:xodio/hm-def.git --increment",
     "test": "mocha test/**/*.spec.js"
   },
   "keywords": [],
   "author": "XOD LLC",
   "license": "MIT",
+  "files": [
+    "/dist/",
+    "/LICENSE",
+    "/README.md",
+    "/package.json"
+  ],
   "dependencies": {
     "hm-parser": "^0.1.5",
     "ramda": "^0.24.1",
@@ -28,6 +35,7 @@
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
     "mocha": "^3.2.0",
-    "sanctuary-type-classes": "^7.1.1"
+    "sanctuary-type-classes": "^7.1.1",
+    "xyz": "3.0.x"
   }
 }
