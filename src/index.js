@@ -1,25 +1,38 @@
-
-import * as R from 'ramda';
-import $ from 'sanctuary-def';
+import $priv from 'sanctuary-def';
 import * as Sig from './signature';
 
-function create({ checkTypes, env, typeClasses = [] }) {
-  const $def = $.create({ checkTypes, env });
+const def = $priv.create ({checkTypes: true, env: $priv.env});
 
-  function def(signature, func) {
-    const params = Sig.resolve(typeClasses, env, signature);
-    return $def(params.name, params.constraints, params.types, func);
-  }
+const Parameters = $priv.RecordType ({
+  $: $priv.Object,
+  checkTypes: $priv.Boolean,
+  env: $priv.Array ($priv.Type),
+  typeClasses: $priv.Array ($priv.TypeClass),
+});
 
-  def.curried = function defUncurried(signature, func) {
-    const params = Sig.resolve(typeClasses, env, signature);
-    const ufunc = R.uncurryN(params.types.length - 1, func);
-    return $def(params.name, params.constraints, params.types, ufunc);
-  };
+export const create = def
+  ('create')
+  ({})
+  ([
+    Parameters,
+    $priv.String,
+    $priv.AnyFunction,
+    $priv.AnyFunction,
+  ])
+  (({$, checkTypes, env, typeClasses}) => {
+    const $def = $.create ({checkTypes, env});
+    const resovleSig = Sig.resolve ($) (typeClasses) (env);
 
-  return def;
-}
-
-export default {
-  create,
-};
+    return $def
+      ('def')
+      ({})
+      ([$.String, $.AnyFunction])
+      (signature => func => {
+        const params = resovleSig (signature);
+        return $def
+          (params.name)
+          (params.constraints)
+          (params.types)
+          (func);
+      });
+  });

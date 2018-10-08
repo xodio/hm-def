@@ -9,6 +9,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'airbnb-base',
+    './node_modules/sanctuary-style/eslint-es6.json'
   ],
 
   globals: {
@@ -23,6 +24,12 @@ module.exports = {
   rules: {
     'no-underscore-dangle': ['error', {
       allow: ["__"], /* Ramda’s R.__ */
-    }]
+    }],
+    'no-spaced-func': 'off',
+    'no-use-before-define': 'off',
+    'new-cap': 'off',
+    'import/prefer-default-export': 'off',
+    'no-underscore-dangle': 'off',
+    'implicit-arrow-linebreak': 'off',
   },
 };
