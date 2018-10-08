@@ -342,6 +342,12 @@ This is consistent with `sanctuary`'s way of currying, known as
 
 ## Changelog
 
+### 1.0.0
+
+* Update `sanctuary-*`, building, and testing dependencies.
+* Breaking :exclamation: functions are no longer curried automatically. See the
+  [currying section](#currying).
+
 ### 0.3.0
 
 * Update `sanctuary-def` dependency to version 0.14.0
@@ -361,6 +367,15 @@ This is consistent with `sanctuary`'s way of currying, known as
 
 * Add `def.curried`
 * Fix errors when using some non-nullary types like built-in `Array` or `StrMap`
+
+## Contributors
+
+Alphabetically:
+
+* [davidchambers](https://github.com/davidchambers)
+* [evgenykochetkov](https://github.com/evgenykochetkov)
+* [Gipphe](https://github.com/Gipphe)
+* [nkrkv](https://github.com/nkrkv)
 
 ## License
 
