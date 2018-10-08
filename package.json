@@ -1,6 +1,6 @@
 {
   "name": "hm-def",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Runtime type checking with Hindley Milner signatures",
   "repository": "https://github.com/xodio/hm-def",
   "main": "dist/index.js",
