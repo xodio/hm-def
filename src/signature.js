@@ -1,8 +1,6 @@
 import S from 'sanctuary';
 import HMP from 'hm-parser';
 import memoize from 'mem';
-import cond from 'lodash.cond';
-import fromPairs from 'lodash.frompairs';
 import Reader from './Reader';
 
 /*
@@ -36,6 +34,18 @@ const indexBy = memoize
   (f => S.reduce
     (xs => x => S.insert (f (x)) (x) (xs))
     ({}));
+//    fromPairs :: Array (Array2 String a) -> StrMap a
+const fromPairs = S.reduce
+  (acc => curr => S.insert (curr[0]) (curr[1]) (acc))
+  ({});
+//    cond :: Array (Array2 (a -> Boolean) (a -> b)) -> a -> b
+const cond = conds => x => {
+  const c = conds.find (y => y[0] (x));
+  if (c !== undefined) {
+    return c[1] (x);
+  }
+  throw new Error (`No predicate was satisfied for ${x}`);
+};
 
 //    stripNamespace :: String -> String
 const stripNamespace = memoize (xs => xs.split ('/').pop ());
