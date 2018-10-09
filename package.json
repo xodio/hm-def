@@ -22,8 +22,6 @@
   "dependencies": {
     "fantasy-land": "^3.5.0",
     "hm-parser": "^0.1.5",
-    "lodash.cond": "^4.5.2",
-    "lodash.frompairs": "^4.0.1",
     "mem": "^4.0.0",
     "sanctuary": "^0.15.0",
     "sanctuary-def": "^0.18.1",
