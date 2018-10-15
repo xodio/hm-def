@@ -19,7 +19,7 @@ const $Wrapper = $.UnaryType
   (S.allPass ([S.is ($.Object), hasProp ('value')]))
   (S.pipe ([S.prop ('value'), S.of (Array)]));
 
-const def = create ({
+const config = {
   $,
   checkTypes: true,
   env: $.env.concat ([
@@ -30,7 +30,8 @@ const def = create ({
     Z.Functor,
     Z.Semigroup,
   ],
-});
+};
+const def = create (config);
 
 describe ('def', () => {
   it ('should work with unary functions', () => {
@@ -184,5 +185,19 @@ describe ('README examples', () => {
       baz: 1,
       qux: 1,
     });
+  });
+
+  it ('should return function as-is if `checkTypes` is `false`', () => {
+    const defNoCheck = create ({
+      ...config,
+      checkTypes: false,
+    });
+    const foo = s => `${s}bar`;
+    const f = defNoCheck
+      ('f :: String -> String')
+      (foo);
+
+    assert.strictEqual (f, foo);
+    assert.equal (f ('foo'), 'foobar');
   });
 });
