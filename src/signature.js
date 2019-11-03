@@ -190,7 +190,7 @@ export const resolve = $ => {
     (t.name)
     (t.url)
     (t.supertypes)
-    (t._test)
+    (t._test ([]))
     (t.extractors.$1);
 
   //    fromBinaryType :: Type -> (Type -> Type -> Type)
@@ -198,7 +198,7 @@ export const resolve = $ => {
     (t.name)
     (t.url)
     (t.supertypes)
-    (t._test)
+    (t._test ([]))
     (t.extractors.$1)
     (t.extractors.$2);
 
