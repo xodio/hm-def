@@ -17,8 +17,8 @@ const $Map = $.BinaryType
 const $Wrapper = $.UnaryType
   ('Wrapper')
   ('someurl')
-  ([])
-  (x => S.is ($.Object) (x) && S.isJust (S.get (S.complement (S.is ($.Undefined))) ('value') (x)))
+  ([$.Object])
+  (x => 'value' in x)
   (S.pipe ([S.prop ('value'), S.of (Array)]));
 
 const def = create ({
