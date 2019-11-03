@@ -23,8 +23,8 @@
     "fantasy-land": "^3.5.0",
     "hm-parser": "^0.1.5",
     "mem": "^4.0.0",
-    "sanctuary": "^1.1.0",
-    "sanctuary-def": "^0.19.0",
+    "sanctuary": "^2.0.0",
+    "sanctuary-def": "^0.20.0",
     "sanctuary-show": "^1.0.0"
   },
   "devDependencies": {

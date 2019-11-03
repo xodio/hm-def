@@ -2944,23 +2944,15 @@ safe-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-sanctuary-def@0.19.0, sanctuary-def@^0.19.0:
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-def/-/sanctuary-def-0.19.0.tgz#84dd038f723512168028654dd89563cbbf3a34af"
-  integrity sha512-1ZJX4LC3Kh4B9bnGGCN8qQS7GrHltLtibQnsaFqaoUpKIT4qCfUuCy/Beke352E948+lmquowyDfkMHtZ/0m3w==
+sanctuary-def@0.20.0, sanctuary-def@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-def/-/sanctuary-def-0.20.0.tgz#bcecc9a1469c025467ea31f0ec6228ed56962bb3"
+  integrity sha512-BjDwAq+4aHZhKyOR35oVfVkCOLfKMOVw6UqQfkzL/Ul5G290J0nITSmnM9fP6EaH2rV/0quR7wgoCgX5Um5YGg==
   dependencies:
-    sanctuary-either "1.0.x"
+    sanctuary-either "1.1.0"
     sanctuary-show "1.0.x"
-    sanctuary-type-classes "10.0.x"
+    sanctuary-type-classes "11.0.x"
     sanctuary-type-identifiers "2.0.x"
-
-sanctuary-either@1.0.x:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-either/-/sanctuary-either-1.0.0.tgz#b6041e54c639700048be757ba4d6c026c2c2f67c"
-  integrity sha512-j4WAlwILU83wawXJQCSh5kVK27gxOykMuCfUfUOba/qUcFE+FxwHkt7lnHVYDjt7jG9SENe8bTQzPH/Zmhy3Ag==
-  dependencies:
-    sanctuary-show "1.0.x"
-    sanctuary-type-classes "9.0.0"
 
 sanctuary-either@1.1.0:
   version "1.1.0"
@@ -2970,21 +2962,29 @@ sanctuary-either@1.1.0:
     sanctuary-show "1.0.x"
     sanctuary-type-classes "10.0.0"
 
-sanctuary-maybe@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-maybe/-/sanctuary-maybe-1.1.0.tgz#b4b6807d949dc56fbc30834aebb925de1a05cddf"
-  integrity sha512-MwHsfddXxfn7Ywy9hiRIA/+lbJBUKeKI/cSHwTKkbLkelSBhSpBgZZI4giSZRwbP9OpxOpbkS+rFc//+HCVwdw==
+sanctuary-either@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-either/-/sanctuary-either-1.2.0.tgz#3126196a2067ea4a9b1de6b6c4c045504059a44b"
+  integrity sha512-CFUK0OOGAe+t+Ct4yVLfkJPABIkplCvIgCOFIJZ+lIMNAeJrSaVacrZVqRErt4YKzDs42ZXecAEpoDL8rRAfsQ==
   dependencies:
     sanctuary-show "1.0.x"
-    sanctuary-type-classes "10.0.0"
+    sanctuary-type-classes "11.0.0"
 
-sanctuary-pair@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-pair/-/sanctuary-pair-1.1.0.tgz#5a0d3d54ba2a1ebcd3a0bf3a2bc7c86c085a36ed"
-  integrity sha512-lr+lTHZCzKD3PAS8YHB0YhVLsKIRIzoeIg5SBWYquXgabVdVShOT+J+7E3cg4v+FOpgN1HWguYQcbJczCSEVyQ==
+sanctuary-maybe@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-maybe/-/sanctuary-maybe-1.2.0.tgz#e994825d62f6d5a3c60771e859261b08c517acc5"
+  integrity sha512-SH4dkyrruJe84/q8YMjc6kWyGbqPH6clM6yfJ/iosQZm+bGK2XPgcPs1yDN0U0zm1JzJ563zdwn64W+aMw5CDw==
   dependencies:
     sanctuary-show "1.0.x"
-    sanctuary-type-classes "10.0.0"
+    sanctuary-type-classes "11.0.0"
+
+sanctuary-pair@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-pair/-/sanctuary-pair-1.2.0.tgz#2538dbdac011594fd601ca1112e83cb5083bc865"
+  integrity sha512-bPu+uFxFE2RP3hLlC6SRMsm4A2aEwHkDwHWuvGzHxYaclGnHCrHy0ykRTuR0Pgqy/ZlWl6zy+8Tek3jME3du6A==
+  dependencies:
+    sanctuary-show "1.0.x"
+    sanctuary-type-classes "11.0.0"
 
 sanctuary-show@1.0.0, sanctuary-show@1.0.x, sanctuary-show@^1.0.0:
   version "1.0.0"
@@ -2996,10 +2996,17 @@ sanctuary-style@^2.0.0:
   resolved "https://registry.yarnpkg.com/sanctuary-style/-/sanctuary-style-2.0.0.tgz#83d023a340641bcc1d27acee013c098b12075586"
   integrity sha512-5g3UnBDY3419ipokMa/PXY9DM7XVU7sUMq3RMHRKnbqS9KYKWYvysljb8/rHi+bWut5n1omWEQJEyKUHY+482w==
 
-sanctuary-type-classes@10.0.0, sanctuary-type-classes@10.0.x:
+sanctuary-type-classes@10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/sanctuary-type-classes/-/sanctuary-type-classes-10.0.0.tgz#25126f009348101dbe627c7b7efb7c6f63f792b1"
   integrity sha512-h5Q1VkW/CmVbmoWDf6HdsgJbx5gc3n6R5lRzzKRssYSkghmqEuAr+0ThJs/bqJK8aiQwh3N2PXP4ZppYEDlSdg==
+  dependencies:
+    sanctuary-type-identifiers "2.0.1"
+
+sanctuary-type-classes@11.0.0, sanctuary-type-classes@11.0.x, sanctuary-type-classes@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-type-classes/-/sanctuary-type-classes-11.0.0.tgz#f7f752a846aad057d894183a20169bc593ddb039"
+  integrity sha512-J9vfS19C9TSd0pIxz7dza0krxUGoo7LYdwQzkmO7zEsbzmPEwbB3HByLgN/zI+QYd0m08IdohAzYJSAd89Fdqg==
   dependencies:
     sanctuary-type-identifiers "2.0.1"
 
@@ -3009,13 +3016,6 @@ sanctuary-type-classes@9.0.0:
   integrity sha512-rFW27f3D622kxKravpGU9OjWn66fnDjDjGPvoYo4hEoBg2ocypvp0R9cs0YovKL3jTO+PTceUBh5tYZ+l9ay3g==
   dependencies:
     sanctuary-type-identifiers "1.0.x"
-
-sanctuary-type-classes@^11.0.0:
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-type-classes/-/sanctuary-type-classes-11.0.0.tgz#f7f752a846aad057d894183a20169bc593ddb039"
-  integrity sha512-J9vfS19C9TSd0pIxz7dza0krxUGoo7LYdwQzkmO7zEsbzmPEwbB3HByLgN/zI+QYd0m08IdohAzYJSAd89Fdqg==
-  dependencies:
-    sanctuary-type-identifiers "2.0.1"
 
 sanctuary-type-identifiers@1.0.x:
   version "1.0.0"
@@ -3027,17 +3027,17 @@ sanctuary-type-identifiers@2.0.1, sanctuary-type-identifiers@2.0.x:
   resolved "https://registry.yarnpkg.com/sanctuary-type-identifiers/-/sanctuary-type-identifiers-2.0.1.tgz#fc524cf6dd92cebfcbb0dd9509eff193159a20ed"
   integrity sha1-/FJM9t2Szr/LsN2VCe/xkxWaIO0=
 
-sanctuary@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/sanctuary/-/sanctuary-1.1.0.tgz#b1e66dd0746377e89bfd1ec0916e010e3f4dc4d3"
-  integrity sha512-GnZoSJ0tlNneowz+shFYLd1+wQ0g9bR3TeBbDi0rwEdpspu6mQPxEghskJrGww2rBNjyPclEL5pzNC0oCUYHAQ==
+sanctuary@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary/-/sanctuary-2.0.0.tgz#71c2e8af7cfe034ece2c7a932232ba917a03dd0f"
+  integrity sha512-FYjhCKBS7meY4Lrjsx7CL+2+qnCsgUqJUvFYoLU7ahiGM8LqTOkhAtdGZGG+bhCIP0iCEfDWRq35pQJTfmtFrg==
   dependencies:
-    sanctuary-def "0.19.0"
-    sanctuary-either "1.1.0"
-    sanctuary-maybe "1.1.0"
-    sanctuary-pair "1.1.0"
+    sanctuary-def "0.20.0"
+    sanctuary-either "1.2.0"
+    sanctuary-maybe "1.2.0"
+    sanctuary-pair "1.2.0"
     sanctuary-show "1.0.0"
-    sanctuary-type-classes "10.0.0"
+    sanctuary-type-classes "11.0.0"
     sanctuary-type-identifiers "2.0.1"
 
 sax@^1.2.4:

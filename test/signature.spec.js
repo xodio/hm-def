@@ -6,6 +6,8 @@ import {resolve} from '../src/signature';
 
 // assertSameType :: Type -> Type -> Undefined !
 const assertSameType = actual => expected => {
+  return assert.isOk (S.equals (actual) (expected)) // FIXME directly replace assertTypePairs( S.zip (types) (..) ) by S.equals (types) (expecteds)
+/*
   assert.strictEqual (actual.name, expected.name);
   assert.strictEqual (actual.type, expected.type);
   assert.deepEqual (actual.keys, expected.keys);
@@ -13,6 +15,7 @@ const assertSameType = actual => expected => {
   expected.keys.forEach (key => {
     assertSameType (actual.types[key].type) (expected.types[key].type);
   });
+*/
 };
 
 const assertTypePairs = xs => xs.forEach
@@ -59,14 +62,14 @@ describe ('Parameter types', () => {
   });
 
   it ('should resolve user types', () => {
-    const Widget = $.NullaryType ('Widget') ('http://example.com/Widget') (S.K (true));
+    const Widget = $.NullaryType ('Widget') ('http://example.com/Widget') ([]) (S.K (true));
     const env = $.env.concat ([Widget]);
     const {types} = resolve ($) ([]) (env) ('foo :: Widget -> String');
     assert.deepEqual (types, [Widget, $.String]);
   });
 
   it ('should resolve namespaced user types', () => {
-    const Widget = $.NullaryType ('x/y/z/Widget') ('http://example.com/Widget') (S.K (true));
+    const Widget = $.NullaryType ('x/y/z/Widget') ('http://example.com/Widget') ([]) (S.K (true));
     const env = $.env.concat ([Widget]);
     const {types} = resolve ($) ([]) (env) ('foo :: Widget -> String');
     assert.deepEqual (types, [Widget, $.String]);
@@ -136,6 +139,7 @@ describe ('Parameter types', () => {
     const Maybe = $.UnaryType
       ('my-package/Maybe')
       ('http://example.com/my-package#Maybe')
+      ([])
       (S.K (true))
       (S.K ([]));
 
@@ -147,11 +151,19 @@ describe ('Parameter types', () => {
   });
 
   it ('should resolve eithers', () => {
+    const Either = $.BinaryType
+      ('my-package/Either')
+      ('http://example.com/my-package#Either')
+      ([])
+      (x => x != null && x['@@type'] === 'my-package/Either')
+      (either => (either.isLeft ? [either.value] : []))
+      (either => (either.isRight ? [either.value] : []));
+
     const env = $.env.concat ([
-      S.EitherType ($.Unknown) ($.Unknown),
+      Either ($.Unknown) ($.Unknown),
     ]);
     const {types} = resolve ($) ([]) (env) ('foo :: Either String Number -> String');
-    assertTypePairs (S.zip (types) ([S.EitherType ($.String) ($.Number), $.String]));
+    assertTypePairs (S.zip (types) ([Either ($.String) ($.Number), $.String]));
   });
 
   it ('should resolve thunks', () => {

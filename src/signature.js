@@ -189,16 +189,18 @@ export const resolve = $ => {
   const fromUnaryType = t => $.UnaryType
     (t.name)
     (t.url)
+    (t.supertypes)
     (t._test)
-    (t.types.$1.extractor);
+    (t.extractors.$1);
 
   //    fromBinaryType :: Type -> (Type -> Type -> Type)
   const fromBinaryType = t => $.BinaryType
     (t.name)
     (t.url)
+    (t.supertypes)
     (t._test)
-    (t.types.$1.extractor)
-    (t.types.$2.extractor);
+    (t.extractors.$1)
+    (t.extractors.$2);
 
   //    constructType :: (Array Type) -> Type -> Type
   const constructType = argTypes => t => {
@@ -217,7 +219,7 @@ export const resolve = $ => {
   };
 
   // Helper Type to wipe out thunks
-  const Thunk = $.NullaryType ('hm-def/Thunk') ('') (S.K (false));
+  const Thunk = $.NullaryType ('hm-def/Thunk') ('') ([]) (S.K (false));
 
   //    convertType :: SignatureEntry -> Reader (TypeMap Type)
   const convertType = memoize (entry => cond ([
