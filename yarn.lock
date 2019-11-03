@@ -3027,10 +3027,10 @@ sanctuary-type-identifiers@2.0.1, sanctuary-type-identifiers@2.0.x:
   resolved "https://registry.yarnpkg.com/sanctuary-type-identifiers/-/sanctuary-type-identifiers-2.0.1.tgz#fc524cf6dd92cebfcbb0dd9509eff193159a20ed"
   integrity sha1-/FJM9t2Szr/LsN2VCe/xkxWaIO0=
 
-sanctuary@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/sanctuary/-/sanctuary-1.0.0.tgz#ecddfd453290b4e269fdc4bb8314e3c25febc79d"
-  integrity sha512-H+C80DadljM0gyWe5Y3R8bDIDW8MU8/XBg0h0V2zwusmljRAVrBQshd6XU3zFxk+lHj04e9xoUvBscRfl8vO8g==
+sanctuary@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/sanctuary/-/sanctuary-1.1.0.tgz#b1e66dd0746377e89bfd1ec0916e010e3f4dc4d3"
+  integrity sha512-GnZoSJ0tlNneowz+shFYLd1+wQ0g9bR3TeBbDi0rwEdpspu6mQPxEghskJrGww2rBNjyPclEL5pzNC0oCUYHAQ==
   dependencies:
     sanctuary-def "0.19.0"
     sanctuary-either "1.1.0"
