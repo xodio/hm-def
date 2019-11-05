@@ -4,8 +4,6 @@ import Z from 'sanctuary-type-classes';
 import {assert} from 'chai';
 import {create} from '../src/index';
 
-const hasProp = p => x => x[p] !== undefined;
-
 const $Map = $.BinaryType
   ('Map')
   ('someurl')

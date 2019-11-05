@@ -1,14 +1,14 @@
 import S from 'sanctuary';
 import $ from 'sanctuary-def';
 import Z from 'sanctuary-type-classes';
+import show from 'sanctuary-show';
 import {assert} from 'chai';
 import {resolve} from '../src/signature';
-import show from 'sanctuary-show';
 
 // assertSameTypes :: [Type] -> [Type] -> Undefined !
 const assertSameTypes = actual => expected => {
   if (!(S.equals (actual) (expected))) { // Array and Type are both Setoid providing equals()
-    assert.equal (show (actual), show (expected), "S.equals"); // assert.equal() because assert.isOk() does not diff actual/expected
+    assert.equal (show (actual), show (expected), 'S.equals'); // assert.equal() because assert.isOk() does not diff actual/expected
     assert.fail (); // final failure in the hypothetical case that show() would return same strings for different types
   }
 };
