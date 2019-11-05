@@ -3,19 +3,14 @@ import $ from 'sanctuary-def';
 import Z from 'sanctuary-type-classes';
 import {assert} from 'chai';
 import {resolve} from '../src/signature';
+import show from 'sanctuary-show';
 
 // assertSameType :: Type -> Type -> Undefined !
 const assertSameType = actual => expected => {
-  return assert.isOk (S.equals (actual) (expected)) // FIXME directly replace assertTypePairs( S.zip (types) (..) ) by S.equals (types) (expecteds)
-/*
-  assert.strictEqual (actual.name, expected.name);
-  assert.strictEqual (actual.type, expected.type);
-  assert.deepEqual (actual.keys, expected.keys);
-  assert.deepEqual (actual.url, expected.url);
-  expected.keys.forEach (key => {
-    assertSameType (actual.types[key].type) (expected.types[key].type);
-  });
-*/
+  if (!(S.equals (actual) (expected))) { // Type is Setoid providing equals()
+    assert.equal (show (actual), show (expected), "S.equals"); // assert.equal() because assert.isOk() does not diff actual/expected
+    assert.fail(); // final failure in the hypothetical case that show() would return same strings for different types
+  }
 };
 
 const assertTypePairs = xs => xs.forEach
