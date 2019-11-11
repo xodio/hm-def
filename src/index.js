@@ -20,6 +20,10 @@ export const create = def
     $priv.AnyFunction,
   ])
   (({$, checkTypes, env, typeClasses}) => {
+    if (!checkTypes) {
+      return _ => f => f;
+    }
+
     const $def = $.create ({checkTypes, env});
     const resovleSig = Sig.resolve ($) (typeClasses) (env);
 
