@@ -1,24 +1,17 @@
 import S from 'sanctuary';
 import $ from 'sanctuary-def';
 import Z from 'sanctuary-type-classes';
+import show from 'sanctuary-show';
 import {assert} from 'chai';
 import {resolve} from '../src/signature';
 
-// assertSameType :: Type -> Type -> Undefined !
-const assertSameType = actual => expected => {
-  assert.strictEqual (actual.name, expected.name);
-  assert.strictEqual (actual.type, expected.type);
-  assert.deepEqual (actual.keys, expected.keys);
-  assert.deepEqual (actual.url, expected.url);
-  expected.keys.forEach (key => {
-    assertSameType (actual.types[key].type) (expected.types[key].type);
-  });
+// assertSameTypes :: [Type] -> [Type] -> Undefined !
+const assertSameTypes = actual => expected => {
+  if (!(S.equals (actual) (expected))) { // Array and Type are both Setoid providing equals()
+    assert.equal (show (actual), show (expected), 'S.equals'); // assert.equal() because assert.isOk() does not diff actual/expected
+    assert.fail (); // final failure in the hypothetical case that show() would return same strings for different types
+  }
 };
-
-const assertTypePairs = xs => xs.forEach
-  (pair => assertSameType
-      (S.fst (pair))
-      (S.snd (pair)));
 
 describe ('Function name', () => {
   it ('should be extracted', () => {
@@ -59,14 +52,14 @@ describe ('Parameter types', () => {
   });
 
   it ('should resolve user types', () => {
-    const Widget = $.NullaryType ('Widget') ('http://example.com/Widget') (S.K (true));
+    const Widget = $.NullaryType ('Widget') ('http://example.com/Widget') ([]) (S.K (true));
     const env = $.env.concat ([Widget]);
     const {types} = resolve ($) ([]) (env) ('foo :: Widget -> String');
     assert.deepEqual (types, [Widget, $.String]);
   });
 
   it ('should resolve namespaced user types', () => {
-    const Widget = $.NullaryType ('x/y/z/Widget') ('http://example.com/Widget') (S.K (true));
+    const Widget = $.NullaryType ('x/y/z/Widget') ('http://example.com/Widget') ([]) (S.K (true));
     const env = $.env.concat ([Widget]);
     const {types} = resolve ($) ([]) (env) ('foo :: Widget -> String');
     assert.deepEqual (types, [Widget, $.String]);
@@ -74,27 +67,22 @@ describe ('Parameter types', () => {
 
   it ('should resolve lists', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: [Number] -> [String]');
-    const expecteds = [$.Array ($.Number), $.Array ($.String)];
-
-    const lists = S.zip (types) (expecteds);
-    assertTypePairs (lists);
+    assertSameTypes (types) ([$.Array ($.Number), $.Array ($.String)]);
   });
 
   it ('should resolve functions', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: Number -> (Number -> Number)');
-    const lists = S.zip (types) ([$.Number, $.Function ([$.Number, $.Number])]);
-    assertTypePairs (lists);
+    assertSameTypes (types) ([$.Number, $.Function ([$.Number, $.Number])]);
   });
 
   it ('should resolve functions that return multi-arity functions', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: Number -> (Number -> Number -> Number)');
-    const lists = S.zip (types) ([$.Number, $.Function ([$.Number, $.Function ([$.Number, $.Number])])]);
-    assertTypePairs (lists);
+    assertSameTypes (types) ([$.Number, $.Function ([$.Number, $.Function ([$.Number, $.Number])])]);
   });
 
   it ('should resolve higher-order functions that take multi-arity functions', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: (Number -> Number -> Number) -> Number');
-    const lists = S.zip (types) ([
+    const expecteds = [
       $.Function ([
         $.Number,
         $.Function ([
@@ -103,14 +91,13 @@ describe ('Parameter types', () => {
         ]),
       ]),
       $.Number,
-    ]);
-    assertTypePairs (lists);
+    ];
+    assertSameTypes (types) (expecteds);
   });
 
   it ('should resolve unary types', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: Number -> StrMap Number');
-    const lists = S.zip (types) ([$.Number, $.StrMap ($.Number)]);
-    assertTypePairs (lists);
+    assertSameTypes (types) ([$.Number, $.StrMap ($.Number)]);
   });
 
   it ('should bark on wrong number of arguments', () => {
@@ -136,6 +123,7 @@ describe ('Parameter types', () => {
     const Maybe = $.UnaryType
       ('my-package/Maybe')
       ('http://example.com/my-package#Maybe')
+      ([])
       (S.K (true))
       (S.K ([]));
 
@@ -143,25 +131,33 @@ describe ('Parameter types', () => {
       Maybe ($.Unknown),
     ]);
     const {types} = resolve ($) ([]) (env) ('foo :: Maybe String -> String');
-    assertTypePairs (S.zip (types) ([Maybe ($.String), $.String]));
+    assertSameTypes (types) ([Maybe ($.String), $.String]);
   });
 
   it ('should resolve eithers', () => {
+    const Either = $.BinaryType
+      ('my-package/Either')
+      ('http://example.com/my-package#Either')
+      ([])
+      (x => x != null && x['@@type'] === 'my-package/Either')
+      (either => (either.isLeft ? [either.value] : []))
+      (either => (either.isRight ? [either.value] : []));
+
     const env = $.env.concat ([
-      S.EitherType ($.Unknown) ($.Unknown),
+      Either ($.Unknown) ($.Unknown),
     ]);
     const {types} = resolve ($) ([]) (env) ('foo :: Either String Number -> String');
-    assertTypePairs (S.zip (types) ([S.EitherType ($.String) ($.Number), $.String]));
+    assertSameTypes (types) ([Either ($.String) ($.Number), $.String]);
   });
 
   it ('should resolve thunks', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: () -> Number');
-    assertTypePairs (S.zip (types) ([$.Number]));
+    assertSameTypes (types) ([$.Number]);
   });
 
   it ('should resolve records', () => {
     const {types} = resolve ($) ([]) ($.env) ('foo :: { value :: Number } -> Number');
-    assertTypePairs (S.zip (types) ([$.RecordType ({value: $.Number}), $.Number]));
+    assertSameTypes (types) ([$.RecordType ({value: $.Number}), $.Number]);
   });
 
   it ('should resolve constraints', () => {
@@ -170,6 +166,6 @@ describe ('Parameter types', () => {
     const f = $.UnaryTypeVariable ('f');
     const tcs = [Z.Functor];
     const {types} = resolve ($) (tcs) ($.env) ('foo :: Functor f => (a -> b) -> f a -> f b');
-    assertTypePairs (S.zip (types) ([$.Function ([a, b]), f (a), f (b)]));
+    assertSameTypes (types) ([$.Function ([a, b]), f (a), f (b)]);
   });
 });

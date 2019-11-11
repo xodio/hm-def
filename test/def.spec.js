@@ -4,11 +4,10 @@ import Z from 'sanctuary-type-classes';
 import {assert} from 'chai';
 import {create} from '../src/index';
 
-const hasProp = p => x => x[p] !== undefined;
-
 const $Map = $.BinaryType
   ('Map')
   ('someurl')
+  ([])
   (S.is ($.Object))
   (S.keys)
   (S.values);
@@ -16,7 +15,8 @@ const $Map = $.BinaryType
 const $Wrapper = $.UnaryType
   ('Wrapper')
   ('someurl')
-  (S.allPass ([S.is ($.Object), hasProp ('value')]))
+  ([$.Object])
+  (x => 'value' in x)
   (S.pipe ([S.prop ('value'), S.of (Array)]));
 
 const def = create ({
@@ -66,7 +66,7 @@ describe ('def', () => {
     const cube = x => x * x * x;
 
     assert.deepEqual (foo (cube) ([1, 2, 3]), [1, 8, 27]);
-    assert.throws (() => foo (cube) ('im-not-an-unary-type'), 'Type-class constraint violation');
+    assert.throws (() => foo (cube) ('im-not-an-unary-type'), 'The value at position 1 is not a member of ‘f a’');
   });
 
   it ('should work with type class constraints', () => {
