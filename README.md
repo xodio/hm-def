@@ -195,7 +195,7 @@ provided by
 [sanctuary-type-classes](https://github.com/sanctuary-js/sanctuary-type-classes)
 and you can create your own.
 
-To use HM definitions with type class constaints you should provide `typeClasses`
+To use HM definitions with type class constraints you should provide `typeClasses`
 option with classes you’d like to use later:
 
 ```javascript
